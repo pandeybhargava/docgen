@@ -1,0 +1,282 @@
+.container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 20px;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+.header {
+  text-align: center;
+  margin-bottom: 30px;
+  background: linear-gradient(135deg, #ff6b6b 0%, #ee5a24 100%);
+  color: white;
+  padding: 30px;
+  border-radius: 10px;
+}
+
+.header h1 {
+  margin: 0 0 10px 0;
+  font-size: 2.5em;
+}
+
+.header p {
+  margin: 0;
+  opacity: 0.9;
+  font-size: 1.1em;
+}
+
+.controls {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+  padding: 20px;
+  background: #f8f9fa;
+  border-radius: 8px;
+}
+
+.form-group {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  max-width: 300px;
+}
+
+.form-group label {
+  font-weight: 600;
+  margin-bottom: 5px;
+  color: #495057;
+}
+
+.form-control {
+  padding: 10px;
+  border: 1px solid #ced4da;
+  border-radius: 4px;
+  font-size: 14px;
+}
+
+.summary-badge {
+  background: #17a2b8;
+  color: white;
+  padding: 10px 20px;
+  border-radius: 20px;
+  font-weight: 600;
+  font-size: 1.1em;
+}
+
+.action-bar {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 20px;
+}
+
+.btn {
+  padding: 10px 20px;
+  border: none;
+  border-radius: 6px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.btn-primary {
+  background: #007bff;
+  color: white;
+}
+
+.btn-primary:hover {
+  background: #0056b3;
+}
+
+.btn-secondary {
+  background: #6c757d;
+  color: white;
+}
+
+.btn-secondary:hover {
+  background: #545b62;
+}
+
+.btn-warning {
+  background: #ffc107;
+  color: #212529;
+}
+
+.btn-warning:hover {
+  background: #e0a800;
+}
+
+.btn-large {
+  padding: 15px 30px;
+  font-size: 16px;
+}
+
+.documents-list {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-bottom: 30px;
+}
+
+.document-item {
+  background: white;
+  border: 2px solid #e9ecef;
+  border-radius: 8px;
+  padding: 20px;
+  transition: all 0.3s ease;
+}
+
+.document-item:hover {
+  border-color: #007bff;
+  box-shadow: 0 4px 8px rgba(0,123,255,0.1);
+}
+
+.document-item.disabled {
+  opacity: 0.6;
+  background: #f8f9fa;
+}
+
+.document-item.not-applicable {
+  background: #f8f9fa;
+  border-color: #dee2e6;
+}
+
+.document-item.not-applicable:hover {
+  border-color: #6c757d;
+}
+
+.document-header {
+  display: flex;
+  align-items: flex-start;
+  gap: 15px;
+}
+
+.checkbox-container {
+  display: block;
+  position: relative;
+  padding-left: 35px;
+  margin-bottom: 12px;
+  cursor: pointer;
+  font-size: 16px;
+  user-select: none;
+  margin-top: 5px;
+}
+
+.checkbox-container input {
+  position: absolute;
+  opacity: 0;
+  cursor: pointer;
+  height: 0;
+  width: 0;
+}
+
+.checkmark {
+  position: absolute;
+  top: 0;
+  left: 0;
+  height: 25px;
+  width: 25px;
+  background-color: #eee;
+  border-radius: 4px;
+  transition: all 0.3s ease;
+}
+
+.checkbox-container:hover input ~ .checkmark {
+  background-color: #ccc;
+}
+
+.checkbox-container input:checked ~ .checkmark {
+  background-color: #28a745;
+}
+
+.checkmark:after {
+  content: "";
+  position: absolute;
+  display: none;
+}
+
+.checkbox-container input:checked ~ .checkmark:after {
+  display: block;
+}
+
+.checkbox-container .checkmark:after {
+  left: 9px;
+  top: 5px;
+  width: 7px;
+  height: 12px;
+  border: solid white;
+  border-width: 0 3px 3px 0;
+  transform: rotate(45deg);
+}
+
+.document-info {
+  flex: 1;
+}
+
+.document-name {
+  margin: 0 0 8px 0;
+  color: #495057;
+  font-size: 1.2em;
+}
+
+.action-description {
+  margin: 0;
+  color: #6c757d;
+  font-style: italic;
+}
+
+.document-requirements {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  min-width: 200px;
+}
+
+.requirement {
+  font-size: 0.9em;
+  color: #495057;
+}
+
+.save-section {
+  text-align: center;
+  padding: 30px;
+  background: #e7f3ff;
+  border-radius: 8px;
+  border-left: 4px solid #007bff;
+}
+
+.save-note {
+  margin: 15px 0 0 0;
+  color: #6c757d;
+  font-style: italic;
+}
+
+@media (max-width: 768px) {
+  .container {
+    padding: 10px;
+  }
+  
+  .controls {
+    flex-direction: column;
+    gap: 15px;
+    align-items: stretch;
+  }
+  
+  .form-group {
+    max-width: none;
+  }
+  
+  .document-header {
+    flex-direction: column;
+    gap: 15px;
+  }
+  
+  .document-requirements {
+    min-width: auto;
+  }
+  
+  .action-bar {
+    flex-wrap: wrap;
+  }
+}

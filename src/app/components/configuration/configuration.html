@@ -1,0 +1,83 @@
+<div class="container">
+  <header class="header">
+    <h1>Document Configuration</h1>
+    <p>Customize which documents are required for each release type</p>
+    <nav class="nav">
+  <a class="nav-btn active" routerLink="/">📋 Generator</a>
+      <a class="nav-btn" routerLink="/config">⚙️ Configuration</a>
+</nav>
+  </header>
+
+  <!-- Rest of the configuration content remains the same -->
+  <div class="controls">
+    <div class="form-group">
+      <label for="releaseType">Release Type:</label>
+      <select 
+        id="releaseType" 
+        [(ngModel)]="selectedReleaseType" 
+        (change)="onReleaseTypeChange()"
+        class="form-control">
+        <option *ngFor="let type of releaseTypes" [value]="type.name">
+          {{ type.name }}
+        </option>
+      </select>
+    </div>
+
+    <div class="summary-badge">
+      {{ getEnabledCount() }}/{{ getTotalCount() }} documents enabled
+    </div>
+  </div>
+
+  <div class="action-bar">
+    <button class="btn btn-secondary" (click)="toggleAllDocuments()">
+      Toggle All
+    </button>
+    <button class="btn btn-primary" (click)="saveConfiguration()">
+      Save Configuration
+    </button>
+    <button class="btn btn-warning" (click)="resetToDefault()">
+      Reset to Default
+    </button>
+  </div>
+
+  <div class="documents-list">
+    <div class="document-item" *ngFor="let doc of documents" 
+         [class.disabled]="!doc.enabled"
+         [class.not-applicable]="doc.docUpVersion === 'NA' || doc.docUpVersion === 'NCC'">
+      <div class="document-header">
+        <label class="checkbox-container">
+          <input 
+            type="checkbox" 
+            [checked]="doc.enabled"
+            (change)="toggleDocument(doc)"
+            [disabled]="doc.docUpVersion === 'NA' || doc.docUpVersion === 'NCC'">
+          <span class="checkmark"></span>
+        </label>
+        
+        <div class="document-info">
+          <h3 class="document-name">{{ doc.documentName }}</h3>
+          <p class="action-description">{{ getActionDescription(doc) }}</p>
+        </div>
+
+        <div class="document-requirements">
+          <div class="requirement">
+            <strong>Up-version:</strong> {{ doc.docUpVersion }}
+          </div>
+          <div class="requirement">
+            <strong>Document ID:</strong> {{ doc.docId }}
+          </div>
+          <div class="requirement">
+            <strong>History:</strong> {{ doc.docHistory }}
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="save-section">
+    <button class="btn btn-primary btn-large" (click)="saveConfiguration()">
+      💾 Save Configuration for {{ selectedReleaseType }}
+    </button>
+    <p class="save-note">Your configurations are saved automatically in your browser's local storage.</p>
+  </div>
+</div>
