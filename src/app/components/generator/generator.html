@@ -3,9 +3,11 @@
     <h1>{{ title }}</h1>
     <p>Generate documentation requirements for your product releases</p>
     <nav class="nav">
-      <a class="nav-btn active" routerLink="/">📋 Generator</a>
-      <a class="nav-btn" routerLink="/config">⚙️ Configuration</a>
-    </nav>
+  <a class="nav-btn active" routerLink="/">📋 Generator</a>
+  <a class="nav-btn" routerLink="/config">⚙️ Configuration</a>
+  <a class="nav-btn" routerLink="/admin/logs" *ngIf="authService.isAdmin()">📊 Logs</a>
+  <a class="nav-btn logout-btn" (click)="authService.logout()">🚪 Logout ({{ authService.getCurrentUser()?.name }})</a>
+</nav>
   </header>
 
   <div class="controls">

@@ -1,13 +1,14 @@
 import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { RouterLink, RouterModule } from '@angular/router'; // Make sure this is imported
+import { RouterLink, RouterModule,RouterLinkActive } from '@angular/router'; // Make sure this is imported
 import { DocumentService, DocumentRequirement, ReleaseType, ReleaseConfiguration } from '../../service/document.service';
+import { AuthService } from '../auth/auth.service';
 
 @Component({
   selector: 'app-configuration',
   standalone: true,
-  imports: [CommonModule, FormsModule,RouterModule, RouterLink],
+  imports: [CommonModule, FormsModule,RouterModule, RouterLink, RouterLinkActive],
   templateUrl: './configuration.html',
   styleUrls: ['./configuration.scss']
 })
@@ -17,7 +18,7 @@ export class ConfigurationComponent {
   documents: DocumentRequirement[] = [];
   showAllDocuments: boolean = true;
 
-  constructor(private documentService: DocumentService) {
+  constructor(private documentService: DocumentService, public authService: AuthService) {
     this.releaseTypes = this.documentService.getReleaseTypes();
     this.loadDocuments();
   }

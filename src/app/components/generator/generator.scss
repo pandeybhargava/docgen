@@ -519,4 +519,15 @@
     box-shadow: none;
     border: 1px solid #dee2e6;
   }
+  
+}
+
+/* Add to generator.component.css */
+.logout-btn {
+  background: linear-gradient(135deg, #ff6b6b, #ee5a24);
+  margin-left: auto;
+}
+
+.logout-btn:hover {
+  background: linear-gradient(135deg, #ff5252, #d84315);
 }

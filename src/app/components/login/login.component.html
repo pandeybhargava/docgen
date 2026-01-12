@@ -1,0 +1,74 @@
+<div class="login-container">
+  <div class="login-card">
+    <div class="login-header">
+      <h1>🔐 Documentation Generator</h1>
+      <p class="subtitle">Secure access to documentation management system</p>
+    </div>
+
+    <div class="login-form">
+      <form (ngSubmit)="onSubmit()" #loginForm="ngForm">
+        <div class="form-group">
+          <label for="username">Username</label>
+          <input
+            type="text"
+            id="username"
+            name="username"
+            [(ngModel)]="username"
+            (keyup)="onKeyPress($event)"
+            placeholder="Enter your username"
+            required
+            autocomplete="username"
+            class="form-control"
+            [class.is-invalid]="errorMessage"
+          >
+        </div>
+
+        <div class="form-group">
+          <label for="password">Password</label>
+          <input
+            type="password"
+            id="password"
+            name="password"
+            [(ngModel)]="password"
+            (keyup)="onKeyPress($event)"
+            placeholder="Enter your password"
+            required
+            autocomplete="current-password"
+            class="form-control"
+            [class.is-invalid]="errorMessage"
+          >
+        </div>
+
+        <div *ngIf="errorMessage" class="alert alert-error">
+          ⚠️ {{ errorMessage }}
+        </div>
+
+        <button 
+          type="submit" 
+          class="btn-login"
+          [disabled]="isLoading"
+        >
+          <span *ngIf="!isLoading">🔓 Login</span>
+          <span *ngIf="isLoading">⏳ Logging in...</span>
+        </button>
+      </form>
+
+      <div class="demo-credentials">
+        <h3>Demo Credentials:</h3>
+        <div class="credential-list">
+          <div *ngFor="let cred of getDemoCredentials()" class="credential-item">
+            <strong>{{ cred.role }}:</strong>
+            <div>Username: <code>{{ cred.username }}</code></div>
+            <div>Password: <code>{{ cred.password }}</code></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="login-footer">
+      <p class="security-note">
+        <small>🔒 All login attempts are logged for security purposes</small>
+      </p>
+    </div>
+  </div>
+</div>

@@ -1,14 +1,14 @@
 import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { RouterModule } from '@angular/router';
+import { RouterModule, RouterLink, RouterLinkActive  } from '@angular/router';
 import { DocumentService, DocumentRequirement, ReleaseType } from '../../service/document.service';
-
+import { AuthService } from '../auth/auth.service';
 
 @Component({
   selector: 'app-generator',
   standalone: true,
-  imports: [CommonModule, FormsModule, RouterModule],
+  imports: [CommonModule, FormsModule, RouterModule, RouterLink, RouterLinkActive],
   templateUrl: './generator.html',
   styleUrls: ['./generator.scss']
 })
@@ -28,8 +28,9 @@ export class GeneratorComponent {
   upVersionDocumentsCount: number = 0;
   notApplicableCount: number = 0;
 
-  constructor(private documentService: DocumentService) {
+  constructor(private documentService: DocumentService, public authService: AuthService) {
     this.releaseTypes = this.documentService.getReleaseTypes();
+    
     this.loadDocuments();
   }
 
