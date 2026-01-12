@@ -3,20 +3,17 @@
     <h1>Document Configuration</h1>
     <p>Customize which documents are required for each release type</p>
     <nav class="nav">
-  <a class="nav-btn active" routerLink="/">📋 Generator</a>
+      <a class="nav-btn active" routerLink="/">📋 Generator</a>
       <a class="nav-btn" routerLink="/config">⚙️ Configuration</a>
-</nav>
+      <a class="nav-btn" routerLink="/change-requests" routerLinkActive="active">📝 Change Requests</a>
+    </nav>
   </header>
 
   <!-- Rest of the configuration content remains the same -->
   <div class="controls">
     <div class="form-group">
       <label for="releaseType">Release Type:</label>
-      <select 
-        id="releaseType" 
-        [(ngModel)]="selectedReleaseType" 
-        (change)="onReleaseTypeChange()"
-        class="form-control">
+      <select id="releaseType" [(ngModel)]="selectedReleaseType" (change)="onReleaseTypeChange()" class="form-control">
         <option *ngFor="let type of releaseTypes" [value]="type.name">
           {{ type.name }}
         </option>
@@ -41,19 +38,15 @@
   </div>
 
   <div class="documents-list">
-    <div class="document-item" *ngFor="let doc of documents" 
-         [class.disabled]="!doc.enabled"
-         [class.not-applicable]="doc.docUpVersion === 'NA' || doc.docUpVersion === 'NCC'">
+    <div class="document-item" *ngFor="let doc of documents" [class.disabled]="!doc.enabled"
+      [class.not-applicable]="doc.docUpVersion === 'NA' || doc.docUpVersion === 'NCC'">
       <div class="document-header">
         <label class="checkbox-container">
-          <input 
-            type="checkbox" 
-            [checked]="doc.enabled"
-            (change)="toggleDocument(doc)"
+          <input type="checkbox" [checked]="doc.enabled" (change)="toggleDocument(doc)"
             [disabled]="doc.docUpVersion === 'NA' || doc.docUpVersion === 'NCC'">
           <span class="checkmark"></span>
         </label>
-        
+
         <div class="document-info">
           <h3 class="document-name">{{ doc.documentName }}</h3>
           <p class="action-description">{{ getActionDescription(doc) }}</p>

@@ -1,0 +1,167 @@
+<div class="container">
+  <header class="header">
+    <h1>📋 Change Request Management</h1>
+    <p>Create, track, and manage change requests for your releases</p>
+    <nav class="nav">
+      <a class="nav-btn" routerLink="/generator">📋 Generator</a>
+      <a class="nav-btn" routerLink="/config">⚙️ Configuration</a>
+      <a class="nav-btn active" routerLink="/change-requests">📝 Change Requests</a>
+      <a class="nav-btn" routerLink="/admin/logs" *ngIf="isAdmin()">📊 Logs</a>
+      <a class="nav-btn logout-btn" (click)="logout()">🚪 Logout ({{ currentUser?.name }})</a>
+    </nav>
+  </header>
+
+ <!-- Search Section - Updated -->
+<div class="controls">
+  <div class="search-section">
+    <input
+      type="text"
+      [(ngModel)]="searchTerm"
+      (input)="onSearchChange()"
+      placeholder="🔍 Search by CR#, title, or description..."
+      class="search-input"
+    >
+    <a routerLink="/change-requests/new" class="btn-create">
+      ➕ Create New Change Request
+    </a>
+  </div>
+
+  <div class="filters">
+    <div class="filter-group">
+      <label>Filter by Status:</label>
+      <select [(ngModel)]="filterStatus" (change)="onFilterChange()" class="filter-select">
+        <option value="all">All Status</option>
+        <option value="Draft">Draft</option>
+        <option value="Submitted">Submitted</option>
+        <option value="Under Review">Under Review</option>
+        <option value="Approved">Approved</option>
+        <option value="Rejected">Rejected</option>
+        <option value="Implemented">Implemented</option>
+        <option value="Closed">Closed</option>
+      </select>
+    </div>
+
+    <div class="filter-group">
+      <label>Filter by Priority:</label>
+      <select [(ngModel)]="filterPriority" (change)="onFilterChange()" class="filter-select">
+        <option value="all">All Priorities</option>
+        <option value="Low">Low</option>
+        <option value="Medium">Medium</option>
+        <option value="High">High</option>
+        <option value="Critical">Critical</option>
+      </select>
+    </div>
+  </div>
+</div>
+
+<!-- Summary Cards Section - Updated -->
+<div class="summary-cards">
+  <div class="summary-card">
+    <div class="card-icon">📝</div>
+    <div class="card-content">
+      <h3>Total CRs</h3>
+      <p class="card-value">{{ totalCount }}</p>
+    </div>
+  </div>
+  
+  <div class="summary-card">
+    <div class="card-icon">⏳</div>
+    <div class="card-content">
+      <h3>In Progress</h3>
+      <p class="card-value">{{ inProgressCount }}</p>
+    </div>
+  </div>
+  
+  <div class="summary-card">
+    <div class="card-icon">✅</div>
+    <div class="card-content">
+      <h3>Approved</h3>
+      <p class="card-value">{{ approvedCount }}</p>
+    </div>
+  </div>
+  
+  <div class="summary-card">
+    <div class="card-icon">🚨</div>
+    <div class="card-content">
+      <h3>Critical</h3>
+      <p class="card-value">{{ criticalCount }}</p>
+    </div>
+  </div>
+</div>
+
+  <div class="requests-table">
+    <div class="table-header">
+      <h2>Change Requests ({{ filteredRequests.length }})</h2>
+      <span class="table-info">Showing {{ filteredRequests.length }} of {{ changeRequests.length }} requests</span>
+    </div>
+
+    <table>
+      <thead>
+        <tr>
+          <th>CR Number</th>
+          <th>Title</th>
+          <th>Priority</th>
+          <th>Status</th>
+          <th>Type</th>
+          <th>Release Type</th>
+          <th>Requested By</th>
+          <th>Requested Date</th>
+          <th>Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let cr of filteredRequests">
+          <td class="cr-number">
+            <strong>{{ cr.crNumber }}</strong>
+          </td>
+          <td class="cr-title">
+            <div class="title-text">{{ cr.title }}</div>
+            <div class="description">{{ cr.description.substring(0, 50) }}...</div>
+          </td>
+          <td>
+            <span class="priority-badge" [class]="getPriorityClass(cr.priority)">
+              {{ cr.priority }}
+            </span>
+          </td>
+          <td>
+            <span class="status-badge" [class]="getStatusClass(cr.status)">
+              {{ getStatusIcon(cr.status) }} {{ cr.status }}
+            </span>
+          </td>
+          <td>{{ cr.type }}</td>
+          <td>{{ cr.releaseType }}</td>
+          <td>{{ cr.requestedBy }}</td>
+          <td>{{ cr.requestedDate | date:'shortDate' }}</td>
+          <td class="actions">
+            <a [routerLink]="['/change-requests', cr.id]" class="btn-action view">
+              👁️ View
+            </a>
+            <a [routerLink]="['/change-requests', cr.id, 'edit']" class="btn-action edit">
+              ✏️ Edit
+            </a>
+            <button (click)="exportToWord(cr)" class="btn-action export">
+              📥 Export
+            </button>
+            <button (click)="deleteChangeRequest(cr.id)" class="btn-action delete">
+              🗑️ Delete
+            </button>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+
+    <div *ngIf="filteredRequests.length === 0" class="no-requests">
+      <div class="empty-state">
+        <div class="empty-icon">📝</div>
+        <h3>No Change Requests Found</h3>
+        <p>No change requests match your current filters.</p>
+        <p *ngIf="searchTerm || filterStatus !== 'all' || filterPriority !== 'all'">
+          Try adjusting your search or filters.
+        </p>
+        <a routerLink="/change-requests/new" class="btn-create-large">
+          ➕ Create Your First Change Request
+        </a>
+      </div>
+    </div>
+  </div>
+</div>

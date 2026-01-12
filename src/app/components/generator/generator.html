@@ -6,6 +6,8 @@
   <a class="nav-btn active" routerLink="/">📋 Generator</a>
   <a class="nav-btn" routerLink="/config">⚙️ Configuration</a>
   <a class="nav-btn" routerLink="/admin/logs" *ngIf="authService.isAdmin()">📊 Logs</a>
+  <a class="nav-btn" routerLink="/change-requests" routerLinkActive="active">📝 Change Requests</a>
+  
   <a class="nav-btn logout-btn" (click)="authService.logout()">🚪 Logout ({{ authService.getCurrentUser()?.name }})</a>
 </nav>
   </header>
