@@ -91,6 +91,7 @@ export class DocumentService {
     return this.releaseTypes;
   }
 
+  
   getDocumentsForRelease(releaseTypeName: string): DocumentRequirement[] {
     const releaseType = this.releaseTypes.find(rt => rt.name === releaseTypeName);
     if (!releaseType) return [];
@@ -140,5 +141,23 @@ export class DocumentService {
     const allConfigs = this.getAllConfigurations();
     const filteredConfigs = allConfigs.filter(c => c.releaseType !== releaseType);
     localStorage.setItem(this.storageKey, JSON.stringify(filteredConfigs));
+  }
+
+  // Add this method to get all available documents
+  getAllDocumentNames(): string[] {
+    return this.documentData.map(doc => doc.documentName);
+    }
+
+    // Add this method to get documents by release type (used by Generator)
+  getDocumentsByReleaseTypeFromGenerator(releaseTypeName: string): string[] {
+    const releaseType = this.releaseTypes.find(rt => rt.name === releaseTypeName);
+    if (!releaseType) return [];
+
+    return this.documentData
+      .filter(doc => {
+        const docValue = doc[releaseType.columns.docUpVersion];
+        return docValue && docValue !== 'NA' && docValue !== 'NCC';
+      })
+      .map(doc => doc.documentName);
   }
 }

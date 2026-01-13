@@ -706,3 +706,237 @@ textarea.form-control {
     width: 100%;
   }
 }
+
+/* Updated Document Section Styles */
+.section-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 16px;
+}
+
+.document-info {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 4px;
+}
+
+.document-count {
+  background: #3b82f6;
+  color: white;
+  padding: 4px 12px;
+  border-radius: 12px;
+  font-size: 12px;
+  font-weight: 500;
+}
+
+.release-type-info {
+  color: #64748b;
+  font-size: 12px;
+}
+
+.document-hint {
+  display: block;
+  margin-top: 8px;
+  color: #64748b;
+  font-size: 13px;
+}
+
+.recommended {
+  color: #f59e0b;
+}
+
+.control-buttons {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.btn-doc-control {
+  padding: 8px 16px;
+  background: #f8fafc;
+  color: #475569;
+  border: 1px solid #e2e8f0;
+  border-radius: 6px;
+  font-weight: 500;
+  font-size: 13px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.btn-doc-control:hover {
+  background: #f1f5f9;
+  border-color: #cbd5e1;
+}
+
+.btn-doc-control.recommended {
+  background: #fffbeb;
+  color: #92400e;
+  border-color: #fde68a;
+}
+
+.btn-doc-control.recommended:hover {
+  background: #fef3c7;
+  border-color: #fbbf24;
+}
+
+.control-icon {
+  font-size: 14px;
+}
+
+.document-search {
+  margin-top: 12px;
+}
+
+.search-input {
+  width: 100%;
+  padding: 10px 12px;
+  border: 1px solid #e2e8f0;
+  border-radius: 6px;
+  font-size: 13px;
+  transition: all 0.2s ease;
+}
+
+.search-input:focus {
+  outline: none;
+  border-color: #3b82f6;
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+}
+
+.documents-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(400px, 1fr));
+  gap: 12px;
+  margin-top: 20px;
+}
+
+.document-card {
+  background: white;
+  border: 1px solid #e2e8f0;
+  border-radius: 8px;
+  padding: 16px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  transition: all 0.2s ease;
+}
+
+.document-card:hover {
+  border-color: #cbd5e1;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+}
+
+.document-checkbox {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex: 1;
+}
+
+.document-checkbox input[type="checkbox"] {
+  width: 18px;
+  height: 18px;
+  border: 2px solid #cbd5e1;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.document-checkbox input[type="checkbox"]:checked {
+  background: #3b82f6;
+  border-color: #3b82f6;
+}
+
+.document-label {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  cursor: pointer;
+  flex: 1;
+}
+
+.document-name {
+  font-weight: 500;
+  color: #1e293b;
+  font-size: 14px;
+}
+
+.recommended-badge {
+  background: #fffbeb;
+  color: #92400e;
+  padding: 2px 8px;
+  border-radius: 10px;
+  font-size: 11px;
+  font-weight: 500;
+  align-self: flex-start;
+}
+
+.document-details {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  align-items: flex-end;
+  min-width: 120px;
+}
+
+.document-action {
+  font-size: 12px;
+  color: #3b82f6;
+  font-weight: 500;
+}
+
+.document-type {
+  padding: 2px 8px;
+  border-radius: 4px;
+  font-size: 11px;
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 0.3px;
+}
+
+.type-requirements { background: #dbeafe; color: #1e40af; }
+.type-assessment { background: #fef3c7; color: #92400e; }
+.type-planning { background: #d1fae5; color: #065f46; }
+.type-testing { background: #e0e7ff; color: #3730a3; }
+.type-validation { background: #fce7f3; color: #9d174d; }
+.type-traceability { background: #f3e8ff; color: #6b21a8; }
+.type-user-doc { background: #f0f9ff; color: #0c4a6e; }
+.type-reporting { background: #fef3c7; color: #92400e; }
+.type-release { background: #dcfce7; color: #166534; }
+.type-documentation { background: #f1f5f9; color: #475569; }
+
+.empty-state {
+  text-align: center;
+  padding: 40px 24px;
+  background: #f8fafc;
+  border-radius: 8px;
+  border: 2px dashed #e2e8f0;
+}
+
+.empty-icon {
+  font-size: 32px;
+  margin-bottom: 12px;
+  opacity: 0.5;
+}
+
+.empty-state h4 {
+  margin: 0 0 8px 0;
+  color: #475569;
+  font-size: 14px;
+}
+
+.empty-state p {
+  margin: 0 0 4px 0;
+  color: #94a3b8;
+  font-size: 13px;
+}
+
+.empty-hint {
+  font-size: 12px;
+  color: #cbd5e1;
+}
+

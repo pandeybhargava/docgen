@@ -1,4 +1,5 @@
 import { Injectable } from '@angular/core';
+import { DocumentService } from './document.service'; // Add this import
 
 export interface ChangeRequest {
   id: string;
@@ -65,7 +66,8 @@ export class ChangeRequestService {
     'Validation Summary Report'
   ];
 
-  constructor() {}
+  // constructor() {}
+  constructor(private documentService: DocumentService) {} // Inject DocumentService
 
   generateCRNumber(): string {
     const today = new Date();
@@ -142,7 +144,14 @@ export class ChangeRequestService {
       ]
     };
     
-    return releaseDocs[releaseType] || this.defaultDocuments;
+    // return releaseDocs[releaseType] || this.defaultDocuments;
+    return this.documentService.getDocumentsByReleaseTypeFromGenerator(releaseType);
+
+  }
+
+   // Update the default documents to use Generator's Major Upgrade list
+  private getDefaultDocuments(): string[] {
+    return this.documentService.getDocumentsByReleaseTypeFromGenerator('Major Upgrade');
   }
 
   getStakeholderTemplates(): any[] {
@@ -151,8 +160,15 @@ export class ChangeRequestService {
       { name: 'QA Lead', role: 'Approver', department: 'Quality Assurance' },
       { name: 'Tech Lead', role: 'Approver', department: 'Engineering' },
       { name: 'Compliance Officer', role: 'Reviewer', department: 'Regulatory Affairs' },
-      { name: 'Documentation Lead', role: 'Reviewer', department: 'Technical Writing' }
+      { name: 'Documentation Lead', role: 'Reviewer', department: 'Technical Writing' },
+      { name: 'Validation Lead', role: 'Reviewer', department: 'Quality Assurance' },
+      { name: 'Project Manager', role: 'Approver', department: 'Project Management' }
     ];
+  }
+
+   // Update to use all Generator documents for selection
+  getAllAvailableDocuments(): string[] {
+    return this.documentService.getAllDocumentNames();
   }
 
   getStatusOptions(): string[] {

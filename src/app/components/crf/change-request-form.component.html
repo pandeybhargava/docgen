@@ -121,46 +121,81 @@
     </section>
 
     <!-- Documents Section -->
-    <section class="form-section">
-      <h2 class="section-title">📄 Required Documents</h2>
-      <p class="section-subtitle">
-        Select documents required for {{ changeRequest.releaseType }} release
-        <span class="doc-count">({{ selectedDocuments.length }} selected)</span>
-      </p>
-      
-      <div class="document-controls">
-        <button type="button" (click)="selectAllDocuments()" class="btn-doc-control">
-          ✓ Select All
-        </button>
-        <button type="button" (click)="deselectAllDocuments()" class="btn-doc-control">
-          ✗ Deselect All
-        </button>
+   <section class="form-section">
+  <div class="section-header">
+    <h2 class="section-title">📄 Required Documents</h2>
+    <div class="document-info">
+      <span class="document-count">
+        {{ selectedDocuments.length }} of {{ availableDocuments.length }} selected
+      </span>
+      <span class="release-type-info">
+        for {{ changeRequest.releaseType }}
+      </span>
+    </div>
+  </div>
+  
+  <p class="section-subtitle">
+    Documents required based on {{ changeRequest.releaseType }} release type.
+    <span class="document-hint">
+      Documents marked with <span class="recommended">★</span> are recommended for change requests.
+    </span>
+  </p>
+  
+  <div class="document-controls">
+    <div class="control-buttons">
+      <button type="button" (click)="selectAllDocuments()" class="btn-doc-control">
+        <span class="control-icon">✓</span> Select All
+      </button>
+      <button type="button" (click)="deselectAllDocuments()" class="btn-doc-control">
+        <span class="control-icon">✗</span> Deselect All
+      </button>
+      <button type="button" (click)="selectRecommended()" class="btn-doc-control recommended">
+        <span class="control-icon">★</span> Select Recommended
+      </button>
+    </div>
+    <div class="document-search">
+      <input 
+        type="text" 
+        [(ngModel)]="documentSearch" 
+        placeholder="Search documents..."
+        class="search-input"
+        (input)="filterDocuments()">
+    </div>
+  </div>
+  
+  <div class="documents-grid">
+    <div *ngFor="let doc of filteredDocuments" class="document-card">
+      <div class="document-checkbox">
+        <input 
+          type="checkbox" 
+          [id]="'doc-' + doc.id"
+          [checked]="isDocumentSelected(doc.name)"
+          (change)="toggleDocument(doc.name)">
+        <label [for]="'doc-' + doc.id" class="document-label">
+          <span class="document-name">{{ doc.name }}</span>
+          <span *ngIf="doc.isRecommended" class="recommended-badge">★ Recommended</span>
+        </label>
       </div>
-      
-      <div class="documents-grid">
-        <div *ngFor="let doc of availableDocuments" class="document-card">
-          <label class="document-checkbox">
-            <input 
-              type="checkbox" 
-              [checked]="isDocumentSelected(doc)"
-              (change)="toggleDocument(doc)">
-            <span class="checkmark"></span>
-            <span class="document-name">{{ doc }}</span>
-          </label>
-          <div class="document-info">
-            <span class="document-status" 
-                  [class.selected]="isDocumentSelected(doc)">
-              {{ isDocumentSelected(doc) ? 'Selected' : 'Not Selected' }}
-            </span>
-          </div>
-        </div>
+      <div class="document-details">
+        <span class="document-action">
+          {{ getDocumentAction(doc.name) }}
+        </span>
+        <span class="document-type" [class]="getDocumentTypeClass(doc.type)">
+          {{ doc.type }}
+        </span>
       </div>
-      
-      <div *ngIf="availableDocuments.length === 0" class="no-documents">
-        <p>No documents available for {{ changeRequest.releaseType }} release type.</p>
-      </div>
-    </section>
-
+    </div>
+  </div>
+  
+  <div *ngIf="availableDocuments.length === 0" class="no-documents">
+    <div class="empty-state">
+      <div class="empty-icon">📄</div>
+      <h4>No Documents Available</h4>
+      <p>No documents are required for {{ changeRequest.releaseType }} release type.</p>
+      <p class="empty-hint">Try selecting a different release type or contact your administrator.</p>
+    </div>
+  </div>
+</section>
     <!-- Risk Assessment Section -->
     <section class="form-section">
       <h2 class="section-title">⚠️ Risk Assessment</h2>

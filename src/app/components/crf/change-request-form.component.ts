@@ -4,6 +4,7 @@ import { FormsModule } from '@angular/forms';
 import { Router, ActivatedRoute } from '@angular/router';
 import { AuthService } from '../auth/auth.service';
 import { ChangeRequestService, ChangeRequest } from '../../service/change-request.service';
+import { DocumentService } from '../../service/document.service'; // Add this import
 
 @Component({
   selector: 'app-change-request-form',
@@ -27,6 +28,7 @@ export class ChangeRequestFormComponent implements OnInit {
   selectedDocuments: string[] = [];
   availableDocuments: string[] = [];
   allDocuments: string[] = [];
+  allGeneratorDocuments: string[] = []; // All documents from Generator
   
   // Stakeholder management
   stakeholders: any[] = [];
@@ -38,9 +40,23 @@ export class ChangeRequestFormComponent implements OnInit {
   // Validation
   formErrors: string[] = [];
 
+  // Add these properties
+documentSearch: string = '';
+filteredDocuments: any[] = [];
+recommendedDocuments = [
+  'Over-arching Change Request',
+  'Risk Assessment',
+  'Impact Assessment - Argus versions',
+  'Test Plan',
+  'Test Summary Report',
+  'Validation Plan',
+  'Validation Summary Report'
+];
+
   constructor(
     private crService: ChangeRequestService,
     private authService: AuthService,
+    private documentService: DocumentService, 
     private router: Router,
     private route: ActivatedRoute
   ) {
@@ -55,6 +71,9 @@ export class ChangeRequestFormComponent implements OnInit {
     this.statusOptions = this.crService.getStatusOptions();
     this.allDocuments = this.crService.getDocumentsByReleaseType('Major Upgrade');
     
+// Load all documents from Generator
+    this.allGeneratorDocuments = this.documentService.getAllDocumentNames();
+
     // Check if edit mode
     const id = this.route.snapshot.params['id'];
     if (id && id !== 'new') {
@@ -74,6 +93,79 @@ export class ChangeRequestFormComponent implements OnInit {
       this.onReleaseTypeChange();
     }
   }
+
+// Add these methods
+filterDocuments(): void {
+  if (!this.documentSearch.trim()) {
+    this.filteredDocuments = this.availableDocuments.map(doc => ({
+      id: this.generateDocumentId(doc),
+      name: doc,
+      isRecommended: this.recommendedDocuments.includes(doc),
+      type: this.getDocumentCategory(doc)
+    }));
+    return;
+  }
+
+  const searchTerm = this.documentSearch.toLowerCase();
+  this.filteredDocuments = this.availableDocuments
+    .filter(doc => doc.toLowerCase().includes(searchTerm))
+    .map(doc => ({
+      id: this.generateDocumentId(doc),
+      name: doc,
+      isRecommended: this.recommendedDocuments.includes(doc),
+      type: this.getDocumentCategory(doc)
+    }));
+}
+
+generateDocumentId(docName: string): string {
+  return docName.toLowerCase().replace(/[^a-z0-9]/g, '_');
+}
+
+getDocumentCategory(docName: string): string {
+  if (docName.includes('Requirement') || docName.includes('UFRS')) return 'Requirements';
+  if (docName.includes('Assessment')) return 'Assessment';
+  if (docName.includes('Plan')) return 'Planning';
+  if (docName.includes('Test')) return 'Testing';
+  if (docName.includes('Validation')) return 'Validation';
+  if (docName.includes('Traceability')) return 'Traceability';
+  if (docName.includes('Manual') || docName.includes('Guide')) return 'User Documentation';
+  if (docName.includes('Report')) return 'Reporting';
+  if (docName.includes('Release')) return 'Release';
+  return 'Documentation';
+}
+
+getDocumentAction(docName: string): string {
+  // Determine action based on document type and release type
+  if (docName === 'Over-arching Change Request') return 'Create New';
+  if (this.changeRequest.releaseType === 'Major Upgrade') {
+    if (docName.includes('Assessment')) return 'Create New';
+    if (docName.includes('Plan')) return 'Create New';
+  }
+  return 'Update Existing';
+}
+
+getDocumentTypeClass(type: string): string {
+  const classes: Record<string, string> = {
+    'Requirements': 'type-requirements',
+    'Assessment': 'type-assessment',
+    'Planning': 'type-planning',
+    'Testing': 'type-testing',
+    'Validation': 'type-validation',
+    'Traceability': 'type-traceability',
+    'User Documentation': 'type-user-doc',
+    'Reporting': 'type-reporting',
+    'Release': 'type-release',
+    'Documentation': 'type-documentation'
+  };
+  return classes[type] || 'type-default';
+}
+
+selectRecommended(): void {
+  // Select only recommended documents that are available
+  this.selectedDocuments = this.availableDocuments.filter(doc => 
+    this.recommendedDocuments.includes(doc)
+  );
+}
 
   getEmptyChangeRequest(): ChangeRequest {
     return {
@@ -129,10 +221,39 @@ export class ChangeRequestFormComponent implements OnInit {
     }));
   }
 
+  // onReleaseTypeChange(): void {
+  //   this.availableDocuments = this.crService.getDocumentsByReleaseType(this.changeRequest.releaseType);
+  //   // Auto-select all documents for the selected release type
+  //   this.selectedDocuments = [...this.availableDocuments];
+  // }
+
   onReleaseTypeChange(): void {
-    this.availableDocuments = this.crService.getDocumentsByReleaseType(this.changeRequest.releaseType);
-    // Auto-select all documents for the selected release type
-    this.selectedDocuments = [...this.availableDocuments];
+    // Get documents for the selected release type from Generator
+    this.availableDocuments = this.documentService
+      .getDocumentsByReleaseTypeFromGenerator(this.changeRequest.releaseType);
+    
+    // Auto-select documents that are typically required for CRs
+    this.autoSelectCommonDocuments();
+    this.filterDocuments(); // Add this
+  }
+  autoSelectCommonDocuments(): void {
+    // Common documents that are usually required for change requests
+    const commonCRDocuments = [
+      'Over-arching Change Request',
+      'Risk Assessment',
+      'Impact Assessment - Argus versions',
+      'Test Plan',
+      'Test Summary Report',
+      'Validation Plan',
+      'Validation Summary Report',
+      'Traceability Matrix (Application)',
+      'Traceability Matrix (Mart)'
+    ];
+
+    // Auto-select common documents that are available for this release type
+    this.selectedDocuments = this.availableDocuments.filter(doc => 
+      commonCRDocuments.includes(doc)
+    );
   }
 
   toggleDocument(document: string): void {
