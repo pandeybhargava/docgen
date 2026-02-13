@@ -1,363 +1,527 @@
-<div class="container">
-  <div class="page-header">
-    <h1>{{ isEditMode ? '✏️ Edit' : '➕ Create New' }} Change Request</h1>
-    <p>{{ isEditMode ? 'Update existing change request' : 'Create a new change request for your release' }}</p>
-  </div>
-
-  <!-- Form Errors -->
-  <div *ngIf="formErrors.length > 0" class="form-errors">
-    <h3>⚠️ Please fix the following errors:</h3>
-    <ul>
-      <li *ngFor="let error of formErrors">{{ error }}</li>
-    </ul>
-  </div>
-
-  <form (ngSubmit)="submitForReview()" #crForm="ngForm" class="cr-form">
+<div class="cr-form-container">
+  <!-- Header Section -->
+  <header class="cr-header">
+    <div class="brand-section">
+      <div class="brand">
+        <span class="brand-icon">📋</span>
+        <span class="brand-name">DocGen</span>
+      </div>
+      <div class="header-content">
+        <h1 class="header-title">{{ isEditMode ? '✏️ Edit' : '➕ Create New' }} Change Request</h1>
+        <p class="header-subtitle">
+          {{ isEditMode ? 'Update existing change request' : 'Create a new change request for your release' }}
+        </p>
+      </div>
+    </div>
     
-    <!-- Basic Information Section -->
-    <section class="form-section">
-      <h2 class="section-title">📋 Basic Information</h2>
-      
-      <div class="form-grid">
-        <div class="form-group">
-          <label for="crNumber">CR Number *</label>
-          <input 
-            type="text" 
-            id="crNumber" 
-            [(ngModel)]="changeRequest.crNumber" 
-            name="crNumber"
-            class="form-control"
-            readonly
-            required>
-          <small class="form-help">Auto-generated CR number</small>
-        </div>
-
-        <div class="form-group">
-          <label for="title">Title *</label>
-          <input 
-            type="text" 
-            id="title" 
-            [(ngModel)]="changeRequest.title" 
-            name="title"
-            class="form-control"
-            placeholder="Enter change request title"
-            required>
-        </div>
-
-        <div class="form-group">
-          <label for="priority">Priority *</label>
-          <select 
-            id="priority" 
-            [(ngModel)]="changeRequest.priority" 
-            name="priority"
-            class="form-control"
-            required>
-            <option *ngFor="let option of priorityOptions" [value]="option">
-              {{ option }}
-            </option>
-          </select>
-        </div>
-
-        <div class="form-group">
-          <label for="type">Type *</label>
-          <select 
-            id="type" 
-            [(ngModel)]="changeRequest.type" 
-            name="type"
-            class="form-control"
-            required>
-            <option *ngFor="let option of typeOptions" [value]="option">
-              {{ option }}
-            </option>
-          </select>
-        </div>
-
-        <div class="form-group">
-          <label for="releaseType">Release Type *</label>
-          <select 
-            id="releaseType" 
-            [(ngModel)]="changeRequest.releaseType" 
-            name="releaseType"
-            class="form-control"
-            (change)="onReleaseTypeChange()"
-            required>
-            <option *ngFor="let option of releaseTypeOptions" [value]="option">
-              {{ option }}
-            </option>
-          </select>
-        </div>
-
-        <div class="form-group">
-          <label for="targetVersion">Target Version *</label>
-          <input 
-            type="text" 
-            id="targetVersion" 
-            [(ngModel)]="changeRequest.targetVersion" 
-            name="targetVersion"
-            class="form-control"
-            placeholder="e.g., v2.1.0"
-            required>
-        </div>
-
-        <div class="form-group full-width">
-          <label for="description">Description *</label>
-          <textarea 
-            id="description" 
-            [(ngModel)]="changeRequest.description" 
-            name="description"
-            class="form-control"
-            rows="5"
-            placeholder="Describe the change request in detail..."
-            required></textarea>
-        </div>
-      </div>
-    </section>
-
-    <!-- Documents Section -->
-   <section class="form-section">
-  <div class="section-header">
-    <h2 class="section-title">📄 Required Documents</h2>
-    <div class="document-info">
-      <span class="document-count">
-        {{ selectedDocuments.length }} of {{ availableDocuments.length }} selected
-      </span>
-      <span class="release-type-info">
-        for {{ changeRequest.releaseType }}
+    <div class="header-status" *ngIf="isEditMode">
+      <span class="status-badge" [ngClass]="getStatusClass(changeRequest.status)">
+        {{ getStatusIcon(changeRequest.status) }} {{ changeRequest.status }}
       </span>
     </div>
-  </div>
-  
-  <p class="section-subtitle">
-    Documents required based on {{ changeRequest.releaseType }} release type.
-    <span class="document-hint">
-      Documents marked with <span class="recommended">★</span> are recommended for change requests.
-    </span>
-  </p>
-  
-  <div class="document-controls">
-    <div class="control-buttons">
-      <button type="button" (click)="selectAllDocuments()" class="btn-doc-control">
-        <span class="control-icon">✓</span> Select All
-      </button>
-      <button type="button" (click)="deselectAllDocuments()" class="btn-doc-control">
-        <span class="control-icon">✗</span> Deselect All
-      </button>
-      <button type="button" (click)="selectRecommended()" class="btn-doc-control recommended">
-        <span class="control-icon">★</span> Select Recommended
-      </button>
-    </div>
-    <div class="document-search">
-      <input 
-        type="text" 
-        [(ngModel)]="documentSearch" 
-        placeholder="Search documents..."
-        class="search-input"
-        (input)="filterDocuments()">
-    </div>
-  </div>
-  
-  <div class="documents-grid">
-    <div *ngFor="let doc of filteredDocuments" class="document-card">
-      <div class="document-checkbox">
-        <input 
-          type="checkbox" 
-          [id]="'doc-' + doc.id"
-          [checked]="isDocumentSelected(doc.name)"
-          (change)="toggleDocument(doc.name)">
-        <label [for]="'doc-' + doc.id" class="document-label">
-          <span class="document-name">{{ doc.name }}</span>
-          <span *ngIf="doc.isRecommended" class="recommended-badge">★ Recommended</span>
-        </label>
-      </div>
-      <div class="document-details">
-        <span class="document-action">
-          {{ getDocumentAction(doc.name) }}
-        </span>
-        <span class="document-type" [class]="getDocumentTypeClass(doc.type)">
-          {{ doc.type }}
-        </span>
-      </div>
-    </div>
-  </div>
-  
-  <div *ngIf="availableDocuments.length === 0" class="no-documents">
-    <div class="empty-state">
-      <div class="empty-icon">📄</div>
-      <h4>No Documents Available</h4>
-      <p>No documents are required for {{ changeRequest.releaseType }} release type.</p>
-      <p class="empty-hint">Try selecting a different release type or contact your administrator.</p>
-    </div>
-  </div>
-</section>
-    <!-- Risk Assessment Section -->
-    <section class="form-section">
-      <h2 class="section-title">⚠️ Risk Assessment</h2>
-      
-      <div class="form-grid">
-        <div class="form-group">
-          <label for="riskLevel">Risk Level *</label>
-          <select 
-            id="riskLevel" 
-            [(ngModel)]="changeRequest.riskAssessment.riskLevel" 
-            name="riskLevel"
-            class="form-control"
-            required>
-            <option value="Low">Low</option>
-            <option value="Medium">Medium</option>
-            <option value="High">High</option>
-          </select>
-        </div>
-        
-        <div class="form-group full-width">
-          <label for="impact">Impact Assessment *</label>
-          <textarea 
-            id="impact" 
-            [(ngModel)]="changeRequest.riskAssessment.impact" 
-            name="impact"
-            class="form-control"
-            rows="3"
-            placeholder="Describe the potential impact of this change..."
-            required></textarea>
-        </div>
-        
-        <div class="form-group full-width">
-          <label for="probability">Probability Assessment *</label>
-          <textarea 
-            id="probability" 
-            [(ngModel)]="changeRequest.riskAssessment.probability" 
-            name="probability"
-            class="form-control"
-            rows="3"
-            placeholder="Describe the likelihood of risks occurring..."
-            required></textarea>
-        </div>
-        
-        <div class="form-group full-width">
-          <label for="mitigation">Mitigation Strategy *</label>
-          <textarea 
-            id="mitigation" 
-            [(ngModel)]="changeRequest.riskAssessment.mitigation" 
-            name="mitigation"
-            class="form-control"
-            rows="3"
-            placeholder="Describe how risks will be mitigated..."
-            required></textarea>
-        </div>
-      </div>
-    </section>
+  </header>
 
-    <!-- Stakeholders Section -->
-    <section class="form-section">
-      <h2 class="section-title">👥 Stakeholders</h2>
-      <p class="section-subtitle">Assign stakeholders and approvers for this change request</p>
+  <!-- Main Content -->
+  <div class="main-content">
+    <!-- Form Errors -->
+    <div *ngIf="formErrors.length > 0" class="error-card">
+      <div class="error-header">
+        <span class="error-icon">⚠️</span>
+        <span class="error-title">Please fix the following errors:</span>
+        <button class="error-close" (click)="formErrors = []">✕</button>
+      </div>
+      <ul class="error-list">
+        <li *ngFor="let error of formErrors">{{ error }}</li>
+      </ul>
+    </div>
+
+    <form (ngSubmit)="submitForReview()" #crForm="ngForm" class="cr-form">
       
-      <div class="stakeholders-list">
-        <div *ngFor="let stakeholder of stakeholders; let i = index" class="stakeholder-card">
-          <div class="stakeholder-header">
+      <!-- Basic Information Section -->
+      <section class="form-section">
+        <div class="section-header">
+          <div class="section-title-wrapper">
+            <span class="section-icon">📋</span>
+            <h2 class="section-title">Basic Information</h2>
+          </div>
+          <div class="section-badge" *ngIf="changeRequest.crNumber">
+            <span class="badge-label">CR Number</span>
+            <span class="badge-value">{{ changeRequest.crNumber }}</span>
+          </div>
+        </div>
+        
+        <div class="form-grid">
+          <!-- Title -->
+          <div class="form-group full-width">
+            <label for="title" class="form-label">
+              <span class="label-icon">📌</span>
+              <span>Title <span class="required">*</span></span>
+            </label>
+            <div class="input-wrapper">
+              <input 
+                type="text" 
+                id="title" 
+                [(ngModel)]="changeRequest.title" 
+                name="title"
+                class="form-control"
+                placeholder="Enter a descriptive title for this change request"
+                required
+                #titleField="ngModel">
+            </div>
+            <div *ngIf="titleField.invalid && titleField.touched" class="field-error">
+              Title is required
+            </div>
+          </div>
+
+          <!-- Priority -->
+          <div class="form-group">
+            <label for="priority" class="form-label">
+              <span class="label-icon">⚠️</span>
+              <span>Priority <span class="required">*</span></span>
+            </label>
+            <div class="select-wrapper">
+              <select 
+                id="priority" 
+                [(ngModel)]="changeRequest.priority" 
+                name="priority"
+                class="form-control"
+                required>
+                <option *ngFor="let option of priorityOptions" [value]="option">
+                  {{ option }}
+                </option>
+              </select>
+              <span class="select-arrow">▼</span>
+            </div>
+          </div>
+
+          <!-- Type -->
+          <div class="form-group">
+            <label for="type" class="form-label">
+              <span class="label-icon">🏷️</span>
+              <span>Type <span class="required">*</span></span>
+            </label>
+            <div class="select-wrapper">
+              <select 
+                id="type" 
+                [(ngModel)]="changeRequest.type" 
+                name="type"
+                class="form-control"
+                required>
+                <option *ngFor="let option of typeOptions" [value]="option">
+                  {{ option }}
+                </option>
+              </select>
+              <span class="select-arrow">▼</span>
+            </div>
+          </div>
+
+          <!-- Release Type -->
+          <div class="form-group">
+            <label for="releaseType" class="form-label">
+              <span class="label-icon">📦</span>
+              <span>Release Type <span class="required">*</span></span>
+            </label>
+            <div class="select-wrapper">
+              <select 
+                id="releaseType" 
+                [(ngModel)]="changeRequest.releaseType" 
+                name="releaseType"
+                (change)="onReleaseTypeChange()"
+                class="form-control"
+                required>
+                <option *ngFor="let option of releaseTypeOptions" [value]="option">
+                  {{ option }}
+                </option>
+              </select>
+              <span class="select-arrow">▼</span>
+            </div>
+          </div>
+
+          <!-- Target Version -->
+          <div class="form-group">
+            <label for="targetVersion" class="form-label">
+              <span class="label-icon">🔖</span>
+              <span>Target Version <span class="required">*</span></span>
+            </label>
+            <div class="input-wrapper">
+              <input 
+                type="text" 
+                id="targetVersion" 
+                [(ngModel)]="changeRequest.targetVersion" 
+                name="targetVersion"
+                class="form-control"
+                placeholder="e.g., v2.1.0"
+                required>
+            </div>
+          </div>
+
+          <!-- Description -->
+          <div class="form-group full-width">
+            <label for="description" class="form-label">
+              <span class="label-icon">📝</span>
+              <span>Description <span class="required">*</span></span>
+            </label>
+            <div class="textarea-wrapper">
+              <textarea 
+                id="description" 
+                [(ngModel)]="changeRequest.description" 
+                name="description"
+                class="form-control textarea"
+                rows="5"
+                placeholder="Describe the change request in detail. Include the reason for the change, expected outcomes, and any dependencies..."
+                required
+                #descriptionField="ngModel"></textarea>
+            </div>
+            <div class="field-hint">
+              {{ changeRequest.description?.length || 0 }}/500 characters
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Required Documents Section -->
+      <section class="form-section">
+        <div class="section-header">
+          <div class="section-title-wrapper">
+            <span class="section-icon">📄</span>
+            <h2 class="section-title">Required Documents</h2>
+          </div>
+          <div class="section-badge">
+            <span class="badge-value">{{ selectedDocuments.length }}/{{ availableDocuments.length }}</span>
+            <span class="badge-label">selected</span>
+          </div>
+        </div>
+        
+        <div class="section-info">
+          <p class="info-text">
+            <span class="info-icon">ℹ️</span>
+            Documents required based on <strong>{{ changeRequest.releaseType }}</strong> release type.
+            Documents marked with <span class="recommended-star">★</span> are recommended.
+          </p>
+        </div>
+        
+        <div class="document-controls">
+          <div class="control-buttons">
+            <button type="button" (click)="selectAllDocuments()" class="btn-control">
+              <span class="control-icon">✓</span>
+              <span>Select All</span>
+            </button>
+            <button type="button" (click)="deselectAllDocuments()" class="btn-control">
+              <span class="control-icon">✗</span>
+              <span>Deselect All</span>
+            </button>
+            <button type="button" (click)="selectRecommended()" class="btn-control recommended">
+              <span class="control-icon">★</span>
+              <span>Select Recommended</span>
+            </button>
+          </div>
+          
+          <div class="document-search">
+            <span class="search-icon">🔍</span>
+            <input 
+              type="text" 
+              [(ngModel)]="documentSearch" 
+              name="documentSearch"
+              placeholder="Search documents..."
+              class="search-input"
+              (input)="filterDocuments()">
+            <button *ngIf="documentSearch" type="button" class="search-clear" (click)="clearDocumentSearch()">✕</button>
+          </div>
+        </div>
+        
+        <div class="documents-grid">
+          <div *ngFor="let doc of filteredDocuments" class="document-card" [class.selected]="isDocumentSelected(doc.name)">
+            <div class="document-checkbox">
+              <label class="checkbox-container">
+                <input 
+                  type="checkbox" 
+                  [checked]="isDocumentSelected(doc.name)"
+                  (change)="toggleDocument(doc.name)">
+                <span class="checkmark"></span>
+              </label>
+              
+              <div class="document-content">
+                <div class="document-header">
+                  <span class="document-name">{{ doc.name }}</span>
+                  <span *ngIf="doc.isRecommended" class="recommended-badge">★ Recommended</span>
+                </div>
+                <div class="document-meta">
+                  <span class="document-type" [ngClass]="getDocumentTypeClass(doc.type)">
+                    {{ doc.type }}
+                  </span>
+                  <span class="document-action">{{ getDocumentAction(doc.name) }}</span>
+                </div>
+              </div>
+            </div>
+            
+            <div class="document-status" *ngIf="isDocumentSelected(doc.name)">
+              <span class="status-indicator selected"></span>
+            </div>
+          </div>
+        </div>
+        
+        <div *ngIf="filteredDocuments.length === 0" class="empty-state">
+          <div class="empty-icon">📄</div>
+          <h3 class="empty-title">No Documents Found</h3>
+          <p class="empty-description">
+            {{ documentSearch ? 'No documents match your search.' : 'No documents are required for this release type.' }}
+          </p>
+          <button *ngIf="documentSearch" type="button" class="empty-action" (click)="clearDocumentSearch()">
+            Clear Search
+          </button>
+        </div>
+      </section>
+
+      <!-- Risk Assessment Section -->
+      <section class="form-section">
+        <div class="section-header">
+          <div class="section-title-wrapper">
+            <span class="section-icon">⚠️</span>
+            <h2 class="section-title">Risk Assessment</h2>
+          </div>
+        </div>
+        
+        <div class="form-grid">
+          <!-- Risk Level -->
+          <div class="form-group">
+            <label for="riskLevel" class="form-label">
+              <span class="label-icon">🎯</span>
+              <span>Risk Level <span class="required">*</span></span>
+            </label>
+            <div class="select-wrapper">
+              <select 
+                id="riskLevel" 
+                [(ngModel)]="changeRequest.riskAssessment.riskLevel" 
+                name="riskLevel"
+                class="form-control"
+                required>
+                <option value="Low">🟢 Low</option>
+                <option value="Medium">🟡 Medium</option>
+                <option value="High">🔴 High</option>
+              </select>
+              <span class="select-arrow">▼</span>
+            </div>
+          </div>
+
+          <!-- Impact Assessment -->
+          <div class="form-group full-width">
+            <label for="impact" class="form-label">
+              <span class="label-icon">💥</span>
+              <span>Impact Assessment <span class="required">*</span></span>
+            </label>
+            <div class="textarea-wrapper">
+              <textarea 
+                id="impact" 
+                [(ngModel)]="changeRequest.riskAssessment.impact" 
+                name="impact"
+                class="form-control textarea"
+                rows="3"
+                placeholder="Describe the potential impact of this change on systems, processes, and users..."
+                required></textarea>
+            </div>
+          </div>
+
+          <!-- Probability Assessment -->
+          <div class="form-group full-width">
+            <label for="probability" class="form-label">
+              <span class="label-icon">📊</span>
+              <span>Probability Assessment <span class="required">*</span></span>
+            </label>
+            <div class="textarea-wrapper">
+              <textarea 
+                id="probability" 
+                [(ngModel)]="changeRequest.riskAssessment.probability" 
+                name="probability"
+                class="form-control textarea"
+                rows="3"
+                placeholder="Describe the likelihood of risks occurring and any contributing factors..."
+                required></textarea>
+            </div>
+          </div>
+
+          <!-- Mitigation Strategy -->
+          <div class="form-group full-width">
+            <label for="mitigation" class="form-label">
+              <span class="label-icon">🛡️</span>
+              <span>Mitigation Strategy <span class="required">*</span></span>
+            </label>
+            <div class="textarea-wrapper">
+              <textarea 
+                id="mitigation" 
+                [(ngModel)]="changeRequest.riskAssessment.mitigation" 
+                name="mitigation"
+                class="form-control textarea"
+                rows="3"
+                placeholder="Describe how risks will be mitigated and what contingency plans are in place..."
+                required></textarea>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Stakeholders Section -->
+      <section class="form-section">
+        <div class="section-header">
+          <div class="section-title-wrapper">
+            <span class="section-icon">👥</span>
+            <h2 class="section-title">Stakeholders</h2>
+          </div>
+          <div class="section-badge">
+            <span class="badge-value">{{ stakeholders.length }}</span>
+            <span class="badge-label">assigned</span>
+          </div>
+        </div>
+        
+        <div class="stakeholders-grid">
+          <div *ngFor="let stakeholder of stakeholders; let i = index" class="stakeholder-card">
+            <div class="stakeholder-avatar">
+              {{ stakeholder.name.charAt(0) }}
+            </div>
             <div class="stakeholder-info">
-              <h4>{{ stakeholder.name }}</h4>
+              <h4 class="stakeholder-name">{{ stakeholder.name }}</h4>
               <span class="stakeholder-role">{{ stakeholder.role }}</span>
               <span class="stakeholder-dept">{{ stakeholder.department }}</span>
             </div>
-            <span class="stakeholder-status" [class]="getStakeholderStatusClass(stakeholder.status)">
-              {{ stakeholder.status }}
-            </span>
+            <div class="stakeholder-status">
+              <span class="status-badge small" [ngClass]="getStakeholderStatusClass(stakeholder.status)">
+                {{ stakeholder.status }}
+              </span>
+            </div>
             <button 
               type="button" 
               (click)="removeStakeholder(i)" 
-              class="btn-remove-stakeholder"
-              *ngIf="!isEditMode">
+              class="stakeholder-remove"
+              *ngIf="!isEditMode"
+              title="Remove stakeholder">
               ✕
             </button>
           </div>
         </div>
-      </div>
-      
-      <div class="add-stakeholder">
-        <h4>Add Additional Stakeholder</h4>
-        <div class="stakeholder-form">
-          <input 
-            type="text" 
-            [(ngModel)]="newStakeholder.name" 
-            name="newStakeholderName"
-            placeholder="Name"
-            class="form-control small">
-          <input 
-            type="text" 
-            [(ngModel)]="newStakeholder.role" 
-            name="newStakeholderRole"
-            placeholder="Role (e.g., Approver, Reviewer)"
-            class="form-control small">
-          <input 
-            type="text" 
-            [(ngModel)]="newStakeholder.department" 
-            name="newStakeholderDept"
-            placeholder="Department"
-            class="form-control small">
-          <button 
-            type="button" 
-            (click)="addStakeholder()" 
-            class="btn-add-stakeholder">
-            ➕ Add
-          </button>
-        </div>
-      </div>
-    </section>
-
-    <!-- Attachments Section -->
-    <section class="form-section">
-      <h2 class="section-title">📎 Attachments</h2>
-      <p class="section-subtitle">Upload supporting documents and files</p>
-      
-      <div class="file-upload-area">
-        <input 
-          type="file" 
-          id="fileUpload" 
-          (change)="onFileSelected($event)"
-          multiple
-          class="file-input"
-          #fileInput>
-        <label for="fileUpload" class="file-upload-label">
-          <div class="upload-icon">📤</div>
-          <h4>Click to upload files</h4>
-          <p>or drag and drop</p>
-          <p class="upload-hint">Supports PDF, Word, Excel, Images (Max 10MB each)</p>
-        </label>
-      </div>
-      
-      <div *ngIf="uploadedFiles.length > 0" class="uploaded-files">
-        <h4>Uploaded Files ({{ uploadedFiles.length }})</h4>
-        <div class="files-list">
-          <div *ngFor="let file of uploadedFiles; let i = index" class="file-card">
-            <div class="file-icon">
-              {{ getFileIcon(file.type) }}
+        
+        <div class="add-stakeholder-section">
+          <h4 class="add-title">➕ Add Stakeholder</h4>
+          <div class="add-stakeholder-form">
+            <div class="form-group small">
+              <input 
+                type="text" 
+                [(ngModel)]="newStakeholder.name" 
+                name="newStakeholderName"
+                placeholder="Name"
+                class="form-control">
             </div>
-            <div class="file-info">
-              <h5>{{ file.name }}</h5>
-              <p class="file-meta">{{ file.size }} • {{ file.type || 'Unknown type' }}</p>
+            <div class="form-group small">
+              <input 
+                type="text" 
+                [(ngModel)]="newStakeholder.role" 
+                name="newStakeholderRole"
+                placeholder="Role (e.g., Approver, Reviewer)"
+                class="form-control">
+            </div>
+            <div class="form-group small">
+              <input 
+                type="text" 
+                [(ngModel)]="newStakeholder.department" 
+                name="newStakeholderDept"
+                placeholder="Department"
+                class="form-control">
             </div>
             <button 
               type="button" 
-              (click)="removeFile(i)" 
-              class="btn-remove-file">
-              ✕ Remove
+              (click)="addStakeholder()" 
+              class="btn-add"
+              [disabled]="!newStakeholder.name || !newStakeholder.role">
+              <span class="btn-icon">➕</span>
+              <span>Add</span>
             </button>
           </div>
         </div>
-      </div>
-    </section>
+      </section>
 
-    <!-- Form Actions -->
-    <div class="form-actions">
-      <button type="button" (click)="cancel()" class="btn-cancel">
-        Cancel
-      </button>
-      <button type="button" (click)="saveDraft()" class="btn-save-draft">
-        💾 Save as Draft
-      </button>
-      <button type="submit" class="btn-submit">
-        📤 Submit for Review
-      </button>
+      <!-- Attachments Section -->
+      <section class="form-section">
+        <div class="section-header">
+          <div class="section-title-wrapper">
+            <span class="section-icon">📎</span>
+            <h2 class="section-title">Attachments</h2>
+          </div>
+          <div class="section-badge" *ngIf="uploadedFiles.length > 0">
+            <span class="badge-value">{{ uploadedFiles.length }}</span>
+            <span class="badge-label">files</span>
+          </div>
+        </div>
+        
+        <div class="file-upload-area" (click)="fileInput.click()">
+          <input 
+            type="file" 
+            id="fileUpload" 
+            (change)="onFileSelected($event)"
+            multiple
+            class="file-input"
+            #fileInput>
+          <div class="upload-content">
+            <span class="upload-icon">📤</span>
+            <h4 class="upload-title">Click to upload files</h4>
+            <p class="upload-text">or drag and drop</p>
+            <p class="upload-hint">Supports PDF, Word, Excel, Images (Max 10MB each)</p>
+          </div>
+        </div>
+        
+        <div *ngIf="uploadedFiles.length > 0" class="uploaded-files">
+          <h4 class="files-title">Uploaded Files</h4>
+          <div class="files-list">
+            <div *ngFor="let file of uploadedFiles; let i = index" class="file-card">
+              <div class="file-icon">{{ getFileIcon(file.type) }}</div>
+              <div class="file-info">
+                <h5 class="file-name">{{ file.name }}</h5>
+                <p class="file-meta">{{ file.size }} • {{ file.type || 'Unknown type' }}</p>
+              </div>
+              <button 
+                type="button" 
+                (click)="removeFile(i)" 
+                class="file-remove"
+                title="Remove file">
+                ✕
+              </button>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Form Actions -->
+      <div class="form-actions">
+        <button type="button" (click)="cancel()" class="btn-cancel">
+          <span class="btn-icon">✕</span>
+          <span>Cancel</span>
+        </button>
+        
+        <button type="button" (click)="saveDraft()" class="btn-draft">
+          <span class="btn-icon">💾</span>
+          <span>Save as Draft</span>
+        </button>
+        
+        <button type="submit" class="btn-submit">
+          <span class="btn-icon">📤</span>
+          <span>Submit for Review</span>
+          <span class="btn-shortcut">⌘S</span>
+        </button>
+      </div>
+    </form>
+  </div>
+
+  <!-- Footer -->
+  <footer class="cr-footer">
+    <div class="footer-info">
+      <span class="footer-icon">👤</span>
+      <span>Created by: {{ currentUser?.name || 'Unknown' }}</span>
+      <span class="footer-separator">•</span>
+      <span class="footer-icon">📅</span>
+      <span>{{ changeRequest.requestedDate | date:'medium' }}</span>
     </div>
-  </form>
+    <div class="footer-actions">
+      <a routerLink="/change-requests" class="footer-link">
+        <span>←</span>
+        Back to List
+      </a>
+    </div>
+  </footer>
 </div>

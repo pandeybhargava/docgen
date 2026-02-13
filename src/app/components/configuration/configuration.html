@@ -1,71 +1,226 @@
-<div class="container">
-  <div class="page-header">
-    <h1>Document Configuration</h1>
-    <p>Customize which documents are required for each release type</p>
-  </div>
-
-  <!-- Rest of the configuration content remains the same -->
-  <div class="controls">
-    <div class="form-group">
-      <label for="releaseType">Release Type:</label>
-      <select id="releaseType" [(ngModel)]="selectedReleaseType" (change)="onReleaseTypeChange()" class="form-control">
-        <option *ngFor="let type of releaseTypes" [value]="type.name">
-          {{ type.name }}
-        </option>
-      </select>
+<div class="config-container">
+  <!-- Header Section -->
+  <header class="config-header">
+    <div class="brand-section">
+      <div class="brand">
+        <span class="brand-icon">⚙️</span>
+        <span class="brand-name">DocGen</span>
+      </div>
+      <div class="header-content">
+        <h1 class="header-title">Document Configuration</h1>
+        <p class="header-subtitle">Customize which documents are required for each release type</p>
+      </div>
     </div>
-
-    <div class="summary-badge">
-      {{ getEnabledCount() }}/{{ getTotalCount() }} documents enabled
+    
+    <div class="config-summary">
+      <div class="summary-stats">
+        <div class="stat-item">
+          <span class="stat-value">{{ getEnabledCount() }}</span>
+          <span class="stat-label">Enabled</span>
+        </div>
+        <div class="stat-divider"></div>
+        <div class="stat-item">
+          <span class="stat-value">{{ getTotalCount() - getEnabledCount() }}</span>
+          <span class="stat-label">Disabled</span>
+        </div>
+        <div class="stat-divider"></div>
+        <div class="stat-item">
+          <span class="stat-value">{{ getTotalCount() }}</span>
+          <span class="stat-label">Total</span>
+        </div>
+      </div>
     </div>
-  </div>
+  </header>
 
-  <div class="action-bar">
-    <button class="btn btn-secondary" (click)="toggleAllDocuments()">
-      Toggle All
-    </button>
-    <button class="btn btn-primary" (click)="saveConfiguration()">
-      Save Configuration
-    </button>
-    <button class="btn btn-warning" (click)="resetToDefault()">
-      Reset to Default
-    </button>
-  </div>
-
-  <div class="documents-list">
-    <div class="document-item" *ngFor="let doc of documents" [class.disabled]="!doc.enabled"
-      [class.not-applicable]="doc.docUpVersion === 'NA' || doc.docUpVersion === 'NCC'">
-      <div class="document-header">
-        <label class="checkbox-container">
-          <input type="checkbox" [checked]="doc.enabled" (change)="toggleDocument(doc)"
-            [disabled]="doc.docUpVersion === 'NA' || doc.docUpVersion === 'NCC'">
-          <span class="checkmark"></span>
-        </label>
-
-        <div class="document-info">
-          <h3 class="document-name">{{ doc.documentName }}</h3>
-          <p class="action-description">{{ getActionDescription(doc) }}</p>
+  <!-- Main Content -->
+  <div class="main-content">
+    <!-- Configuration Controls -->
+    <div class="controls-card">
+      <div class="controls-grid">
+        <!-- Release Type Selector -->
+        <div class="control-group">
+          <label for="releaseType" class="control-label">
+            <span class="label-icon">📌</span>
+            <span>Release Type</span>
+          </label>
+          <div class="select-wrapper">
+            <select 
+              id="releaseType" 
+              [(ngModel)]="selectedReleaseType" 
+              (change)="onReleaseTypeChange()"
+              class="form-control"
+            >
+              <option *ngFor="let type of releaseTypes" [value]="type.name">
+                {{ type.name }}
+              </option>
+            </select>
+            <span class="select-arrow">▼</span>
+          </div>
+          <span class="control-hint">Select release type to configure</span>
         </div>
 
-        <div class="document-requirements">
-          <div class="requirement">
-            <strong>Up-version:</strong> {{ doc.docUpVersion }}
+        <!-- Quick Stats Badge -->
+        <div class="control-group stats-badge-group">
+          <div class="stats-badge">
+            <div class="badge-icon">📋</div>
+            <div class="badge-content">
+              <span class="badge-label">Documents configured for</span>
+              <span class="badge-value">{{ selectedReleaseType }}</span>
+            </div>
           </div>
-          <div class="requirement">
-            <strong>Document ID:</strong> {{ doc.docId }}
+        </div>
+      </div>
+
+      <!-- Action Buttons -->
+      <div class="action-bar">
+        <button class="btn btn-secondary" (click)="toggleAllDocuments()">
+          <span class="btn-icon">🔄</span>
+          <span class="btn-text">Toggle All</span>
+          <span class="btn-hint">{{ getEnabledCount() }}/{{ getTotalCount() }} enabled</span>
+        </button>
+        
+        <button class="btn btn-primary" (click)="saveConfiguration()">
+          <span class="btn-icon">💾</span>
+          <span class="btn-text">Save Configuration</span>
+          <span class="btn-shortcut">⌘S</span>
+        </button>
+        
+        <button class="btn btn-warning" (click)="resetToDefault()">
+          <span class="btn-icon">↺</span>
+          <span class="btn-text">Reset to Default</span>
+        </button>
+      </div>
+    </div>
+
+    <!-- Documents List Section -->
+    <div class="documents-card">
+      <div class="card-header">
+        <div class="header-left">
+          <span class="header-icon">📑</span>
+          <div class="header-text">
+            <h2 class="header-title">Document Requirements</h2>
+            <p class="header-description">
+              Enable/disable documents for {{ selectedReleaseType }} release
+            </p>
           </div>
-          <div class="requirement">
-            <strong>History:</strong> {{ doc.docHistory }}
+        </div>
+        
+        <!-- Search/Filter (Optional) -->
+        <div class="header-search">
+          <span class="search-icon">🔍</span>
+          <input 
+            type="text" 
+            class="search-input" 
+            placeholder="Search documents..."
+            (input)="filterDocuments($event)"
+          >
+        </div>
+      </div>
+
+      <!-- Documents Grid -->
+      <div class="documents-grid">
+        <div *ngFor="let doc of filteredDocuments" 
+             class="document-card" 
+             [class.disabled]="!doc.enabled"
+             [class.not-applicable]="doc.docUpVersion === 'NA' || doc.docUpVersion === 'NCC'">
+          
+          <div class="document-checkbox">
+            <label class="checkbox-container">
+              <input 
+                type="checkbox" 
+                [checked]="doc.enabled" 
+                (change)="toggleDocument(doc)"
+                [disabled]="doc.docUpVersion === 'NA' || doc.docUpVersion === 'NCC'"
+              >
+              <span class="checkmark"></span>
+            </label>
           </div>
+
+          <div class="document-content">
+            <div class="document-header">
+              <div class="document-title-section">
+                <span class="document-icon" [class.disabled-icon]="!doc.enabled">
+                  {{ doc.enabled ? '📄' : '📕' }}
+                </span>
+                <h3 class="document-name">{{ doc.documentName }}</h3>
+                <span *ngIf="doc.docUpVersion === 'NA' || doc.docUpVersion === 'NCC'" 
+                      class="na-badge">
+                  N/A
+                </span>
+              </div>
+              <p class="document-description">{{ getActionDescription(doc) }}</p>
+            </div>
+
+            <div class="document-requirements">
+              <div class="requirement-item">
+                <span class="requirement-label">Up-version</span>
+                <span class="requirement-value" [class]="getRequirementClass(doc.docUpVersion)">
+                  {{ doc.docUpVersion }}
+                </span>
+              </div>
+              
+              <div class="requirement-item">
+                <span class="requirement-label">Document ID</span>
+                <span class="requirement-value doc-id">{{ doc.docId }}</span>
+              </div>
+              
+              <div class="requirement-item">
+                <span class="requirement-label">History</span>
+                <span class="requirement-value history-badge" 
+                      [class.yes]="doc.docHistory === 'Yes'"
+                      [class.no]="doc.docHistory === 'No'">
+                  {{ doc.docHistory }}
+                </span>
+              </div>
+            </div>
+          </div>
+
+          <div class="document-status" *ngIf="doc.enabled && doc.docUpVersion !== 'NA' && doc.docUpVersion !== 'NCC'">
+            <span class="status-indicator active"></span>
+            <span class="status-text">Active</span>
+          </div>
+        </div>
+
+        <!-- Empty State -->
+        <div *ngIf="filteredDocuments.length === 0" class="empty-state">
+          <div class="empty-icon">📭</div>
+          <h3 class="empty-title">No documents found</h3>
+          <p class="empty-description">Try adjusting your search criteria</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Save Configuration Bar (Sticky) -->
+    <div class="save-bar" *ngIf="hasUnsavedChanges">
+      <div class="save-bar-content">
+        <div class="save-bar-info">
+          <span class="info-icon">💡</span>
+          <span>You have unsaved changes for <strong>{{ selectedReleaseType }}</strong></span>
+        </div>
+        <div class="save-bar-actions">
+          <button class="btn btn-text" (click)="loadDocuments()">
+            Cancel
+          </button>
+          <button class="btn btn-primary" (click)="saveConfiguration()">
+            <span class="btn-icon">💾</span>
+            Save Changes
+          </button>
         </div>
       </div>
     </div>
   </div>
 
-  <div class="save-section">
-    <button class="btn btn-primary btn-large" (click)="saveConfiguration()">
-      💾 Save Configuration for {{ selectedReleaseType }}
-    </button>
-    <p class="save-note">Your configurations are saved automatically in your browser's local storage.</p>
-  </div>
+  <!-- Footer -->
+  <footer class="config-footer">
+    <div class="footer-info">
+      <span class="footer-icon">💾</span>
+      <span>Configurations are automatically saved to your browser's local storage</span>
+    </div>
+    <div class="footer-actions">
+      <a routerLink="/generator" class="footer-link">
+        <span>←</span>
+        Back to Generator
+      </a>
+    </div>
+  </footer>
 </div>

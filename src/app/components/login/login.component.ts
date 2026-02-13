@@ -1,30 +1,41 @@
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { Router, ActivatedRoute } from '@angular/router';
+import { Router, ActivatedRoute, RouterModule } from '@angular/router';
 import { AuthService } from '../auth/auth.service';
 
 @Component({
   selector: 'app-login',
   standalone: true,
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule, RouterModule],
   templateUrl: './login.component.html',
   styleUrls: ['./login.component.css']
 })
-export class LoginComponent {
+export class LoginComponent implements OnInit {
   username: string = '';
   password: string = '';
   errorMessage: string = '';
   isLoading: boolean = false;
   returnUrl: string = '/generator';
+  rememberMe: boolean = false;
+  showPassword: boolean = false;
+  showDemo: boolean = true;
 
   constructor(
     private authService: AuthService,
     private router: Router,
     private route: ActivatedRoute
-  ) {
-    // Get return URL from route parameters or default to '/'
+  ) {}
+
+  ngOnInit() {
     this.returnUrl = this.route.snapshot.queryParams['returnUrl'] || '/generator';
+    
+    // Check for saved username
+    const savedUsername = localStorage.getItem('remembered_username');
+    if (savedUsername) {
+      this.username = savedUsername;
+      this.rememberMe = true;
+    }
   }
 
   onSubmit(): void {
@@ -36,7 +47,14 @@ export class LoginComponent {
     this.isLoading = true;
     this.errorMessage = '';
 
-    // Simulate API call delay
+    // Save username if remember me is checked
+    if (this.rememberMe) {
+      localStorage.setItem('remembered_username', this.username);
+    } else {
+      localStorage.removeItem('remembered_username');
+    }
+
+    // Simulate API call
     setTimeout(() => {
       const isAuthenticated = this.authService.login(this.username, this.password);
       
@@ -48,20 +66,14 @@ export class LoginComponent {
       }
       
       this.isLoading = false;
-    }, 500);
-  }
-
-  onKeyPress(event: KeyboardEvent): void {
-    if (event.key === 'Enter') {
-      this.onSubmit();
-    }
+    }, 800);
   }
 
   getDemoCredentials(): { username: string, password: string, role: string }[] {
     return [
-      { username: 'admin', password: 'password123', role: 'Administrator' },
-      { username: 'user1', password: 'password123', role: 'Regular User' },
-      { username: 'qa', password: 'password123', role: 'QA Tester' }
+      { username: 'admin', password: 'admin123', role: 'Admin' },
+      { username: 'emma.wilson', password: 'demo123', role: 'Manager' },
+      { username: 'michael.chen', password: 'demo123', role: 'Writer' }
     ];
   }
 }

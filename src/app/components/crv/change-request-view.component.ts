@@ -51,12 +51,11 @@ export class ChangeRequestViewComponent implements OnInit {
     this.isLoading = true;
     this.errorMessage = '';
     
-    // Remove setTimeout and load immediately
     const cr = this.crService.getChangeRequestById(id);
     
     if (cr) {
       this.changeRequest = cr;
-      this.newStatus = cr.status;
+      this.newStatus = cr.status as any;
       this.isLoading = false;
     } else {
       this.errorMessage = 'Change Request not found!';
@@ -81,7 +80,6 @@ export class ChangeRequestViewComponent implements OnInit {
       });
       
       this.crService.saveChangeRequest(this.changeRequest);
-      this.newComment = '';
       
       // Add to service history
       this.crService.addHistoryEntry(
@@ -90,6 +88,8 @@ export class ChangeRequestViewComponent implements OnInit {
         'Comment Added',
         this.newComment
       );
+      
+      this.newComment = '';
     }
   }
 
@@ -100,7 +100,7 @@ export class ChangeRequestViewComponent implements OnInit {
       
       // Update stakeholder status
       const userStakeholder = this.changeRequest.stakeholders.find(
-        s => s.name === this.currentUser?.name
+        (s: any) => s.name === this.currentUser?.name
       );
       if (userStakeholder) {
         userStakeholder.status = 'Approved';
@@ -130,7 +130,7 @@ export class ChangeRequestViewComponent implements OnInit {
       
       // Update stakeholder status
       const userStakeholder = this.changeRequest.stakeholders.find(
-        s => s.name === this.currentUser?.name
+        (s: any) => s.name === this.currentUser?.name
       );
       if (userStakeholder) {
         userStakeholder.status = 'Rejected';
@@ -202,7 +202,7 @@ export class ChangeRequestViewComponent implements OnInit {
       return 0;
     }
     const completed = this.changeRequest.impactedDocuments.filter(
-      doc => doc.status === 'Completed'
+      (doc: any) => doc.status === 'Completed'
     ).length;
     return (completed / this.changeRequest.impactedDocuments.length) * 100;
   }
@@ -210,7 +210,7 @@ export class ChangeRequestViewComponent implements OnInit {
   getCompletedDocuments(): number {
     if (!this.changeRequest) return 0;
     return this.changeRequest.impactedDocuments.filter(
-      doc => doc.status === 'Completed'
+      (doc: any) => doc.status === 'Completed'
     ).length;
   }
 
@@ -219,7 +219,7 @@ export class ChangeRequestViewComponent implements OnInit {
       return 0;
     }
     const approved = this.changeRequest.stakeholders.filter(
-      s => s.status === 'Approved'
+      (s: any) => s.status === 'Approved'
     ).length;
     return (approved / this.changeRequest.stakeholders.length) * 100;
   }
@@ -227,7 +227,7 @@ export class ChangeRequestViewComponent implements OnInit {
   getApprovedStakeholders(): number {
     if (!this.changeRequest) return 0;
     return this.changeRequest.stakeholders.filter(
-      s => s.status === 'Approved'
+      (s: any) => s.status === 'Approved'
     ).length;
   }
 
@@ -244,6 +244,19 @@ export class ChangeRequestViewComponent implements OnInit {
     return classes[status] || 'status-default';
   }
 
+  getStatusIcon(status: string): string {
+    const icons: Record<string, string> = {
+      'Draft': '📝',
+      'Submitted': '📤',
+      'Under Review': '🔍',
+      'Approved': '✅',
+      'Rejected': '❌',
+      'Implemented': '🛠️',
+      'Closed': '🔒'
+    };
+    return icons[status] || '📄';
+  }
+
   getPriorityClass(priority: string): string {
     const classes: Record<string, string> = {
       'Low': 'priority-low',
@@ -252,6 +265,16 @@ export class ChangeRequestViewComponent implements OnInit {
       'Critical': 'priority-critical'
     };
     return classes[priority] || 'priority-default';
+  }
+
+  getPriorityIcon(priority: string): string {
+    const icons: Record<string, string> = {
+      'Low': '🟢',
+      'Medium': '🟡',
+      'High': '🟠',
+      'Critical': '🔴'
+    };
+    return icons[priority] || '⚪';
   }
 
   getStakeholderStatusClass(status: string): string {
@@ -273,10 +296,19 @@ export class ChangeRequestViewComponent implements OnInit {
     return classes[status] || 'doc-default';
   }
 
+  getFileIcon(type: string): string {
+    if (type.includes('pdf')) return '📕';
+    if (type.includes('word') || type.includes('document')) return '📘';
+    if (type.includes('excel') || type.includes('spreadsheet')) return '📗';
+    if (type.includes('image')) return '🖼️';
+    if (type.includes('zip') || type.includes('compressed')) return '🗜️';
+    return '📄';
+  }
+
   isApprover(): boolean {
     if (!this.changeRequest || !this.currentUser) return false;
     return this.changeRequest.stakeholders.some(
-      s => s.name === this.currentUser.name && s.role === 'Approver'
+      (s: any) => s.name === this.currentUser.name && s.role.includes('Approver')
     );
   }
 

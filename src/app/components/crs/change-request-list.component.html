@@ -1,160 +1,259 @@
-<div class="container">
-  <div class="page-header">
-    <h1>📋 Change Request Management</h1>
-    <p>Create, track, and manage change requests for your releases</p>
-  </div>
+<div class="cr-container">
+  <!-- Header Section -->
+  <header class="cr-header">
+    <div class="brand-section">
+      <div class="brand">
+        <span class="brand-icon">📋</span>
+        <span class="brand-name">DocGen</span>
+      </div>
+      <div class="header-content">
+        <h1 class="header-title">Change Request Management</h1>
+        <p class="header-subtitle">Create, track, and manage change requests for your releases</p>
+      </div>
+    </div>
+    
+    <div class="header-actions">
+      <a routerLink="/change-requests/new" class="btn-create">
+        <span class="btn-icon">➕</span>
+        <span class="btn-text">New Change Request</span>
+        <span class="btn-shortcut">⌘N</span>
+      </a>
+    </div>
+  </header>
 
- <!-- Search Section - Updated -->
-<div class="controls">
-  <div class="search-section">
-    <input
-      type="text"
-      [(ngModel)]="searchTerm"
-      (input)="onSearchChange()"
-      placeholder="🔍 Search by CR#, title, or description..."
-      class="search-input"
-    >
-    <a routerLink="/change-requests/new" class="btn-create">
-      ➕ Create New Change Request
-    </a>
-  </div>
+  <!-- Main Content -->
+  <div class="main-content">
+    <!-- Controls Card -->
+    <div class="controls-card">
+      <div class="search-section">
+        <div class="search-wrapper">
+          <span class="search-icon">🔍</span>
+          <input
+            type="text"
+            [(ngModel)]="searchTerm"
+            (input)="onSearchChange()"
+            placeholder="Search by CR#, title, or description..."
+            class="search-input"
+          >
+          <button *ngIf="searchTerm" class="search-clear" (click)="clearSearch()">✕</button>
+        </div>
+      </div>
 
-  <div class="filters">
-    <div class="filter-group">
-      <label>Filter by Status:</label>
-      <select [(ngModel)]="filterStatus" (change)="onFilterChange()" class="filter-select">
-        <option value="all">All Status</option>
-        <option value="Draft">Draft</option>
-        <option value="Submitted">Submitted</option>
-        <option value="Under Review">Under Review</option>
-        <option value="Approved">Approved</option>
-        <option value="Rejected">Rejected</option>
-        <option value="Implemented">Implemented</option>
-        <option value="Closed">Closed</option>
-      </select>
+      <div class="filters-section">
+        <div class="filter-group">
+          <span class="filter-label">
+            <span class="label-icon">🏷️</span>
+            Status
+          </span>
+          <div class="select-wrapper small">
+            <select [(ngModel)]="filterStatus" (change)="onFilterChange()" class="filter-select">
+              <option value="all">All Statuses</option>
+              <option value="Draft">Draft</option>
+              <option value="Submitted">Submitted</option>
+              <option value="Under Review">Under Review</option>
+              <option value="Approved">Approved</option>
+              <option value="Rejected">Rejected</option>
+              <option value="Implemented">Implemented</option>
+              <option value="Closed">Closed</option>
+            </select>
+            <span class="select-arrow">▼</span>
+          </div>
+        </div>
+
+        <div class="filter-group">
+          <span class="filter-label">
+            <span class="label-icon">⚠️</span>
+            Priority
+          </span>
+          <div class="select-wrapper small">
+            <select [(ngModel)]="filterPriority" (change)="onFilterChange()" class="filter-select">
+              <option value="all">All Priorities</option>
+              <option value="Low">Low</option>
+              <option value="Medium">Medium</option>
+              <option value="High">High</option>
+              <option value="Critical">Critical</option>
+            </select>
+            <span class="select-arrow">▼</span>
+          </div>
+        </div>
+
+        <div class="filter-actions">
+          <button class="btn-reset-filters" (click)="resetFilters()" *ngIf="isFilterActive()">
+            <span class="btn-icon">↺</span>
+            Clear Filters
+          </button>
+        </div>
+      </div>
     </div>
 
-    <div class="filter-group">
-      <label>Filter by Priority:</label>
-      <select [(ngModel)]="filterPriority" (change)="onFilterChange()" class="filter-select">
-        <option value="all">All Priorities</option>
-        <option value="Low">Low</option>
-        <option value="Medium">Medium</option>
-        <option value="High">High</option>
-        <option value="Critical">Critical</option>
-      </select>
-    </div>
-  </div>
-</div>
-
-<!-- Summary Cards Section - Updated -->
-<div class="summary-cards">
-  <div class="summary-card">
-    <div class="card-icon">📝</div>
-    <div class="card-content">
-      <h3>Total CRs</h3>
-      <p class="card-value">{{ totalCount }}</p>
-    </div>
-  </div>
-  
-  <div class="summary-card">
-    <div class="card-icon">⏳</div>
-    <div class="card-content">
-      <h3>In Progress</h3>
-      <p class="card-value">{{ inProgressCount }}</p>
-    </div>
-  </div>
-  
-  <div class="summary-card">
-    <div class="card-icon">✅</div>
-    <div class="card-content">
-      <h3>Approved</h3>
-      <p class="card-value">{{ approvedCount }}</p>
-    </div>
-  </div>
-  
-  <div class="summary-card">
-    <div class="card-icon">🚨</div>
-    <div class="card-content">
-      <h3>Critical</h3>
-      <p class="card-value">{{ criticalCount }}</p>
-    </div>
-  </div>
-</div>
-
-  <div class="requests-table">
-    <div class="table-header">
-      <h2>Change Requests ({{ filteredRequests.length }})</h2>
-      <span class="table-info">Showing {{ filteredRequests.length }} of {{ changeRequests.length }} requests</span>
+    <!-- Summary Cards -->
+    <div class="summary-cards">
+      <div class="summary-card total">
+        <div class="card-icon">📋</div>
+        <div class="card-content">
+          <span class="card-label">Total CRs</span>
+          <span class="card-value">{{ totalCount }}</span>
+          <span class="card-trend">+{{ lastWeekCount }} this week</span>
+        </div>
+      </div>
+      
+      <div class="summary-card progress">
+        <div class="card-icon">⏳</div>
+        <div class="card-content">
+          <span class="card-label">In Progress</span>
+          <span class="card-value">{{ inProgressCount }}</span>
+          <span class="card-percentage">{{ (inProgressCount/totalCount || 0) | percent }}</span>
+        </div>
+      </div>
+      
+      <div class="summary-card approved">
+        <div class="card-icon">✅</div>
+        <div class="card-content">
+          <span class="card-label">Approved</span>
+          <span class="card-value">{{ approvedCount }}</span>
+          <span class="card-percentage">{{ (approvedCount/totalCount || 0) | percent }}</span>
+        </div>
+      </div>
+      
+      <div class="summary-card critical">
+        <div class="card-icon">🚨</div>
+        <div class="card-content">
+          <span class="card-label">Critical</span>
+          <span class="card-value">{{ criticalCount }}</span>
+          <span class="card-subtext">Requires immediate attention</span>
+        </div>
+      </div>
     </div>
 
-    <table>
-      <thead>
-        <tr>
-          <th>CR Number</th>
-          <th>Title</th>
-          <th>Priority</th>
-          <th>Status</th>
-          <th>Type</th>
-          <th>Release Type</th>
-          <th>Requested By</th>
-          <th>Requested Date</th>
-          <th>Actions</th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr *ngFor="let cr of filteredRequests">
-          <td class="cr-number">
-            <strong>{{ cr.crNumber }}</strong>
-          </td>
-          <td class="cr-title">
-            <div class="title-text">{{ cr.title }}</div>
-            <div class="description">{{ cr.description.substring(0, 50) }}...</div>
-          </td>
-          <td>
-            <span class="priority-badge" [class]="getPriorityClass(cr.priority)">
-              {{ cr.priority }}
-            </span>
-          </td>
-          <td>
-            <span class="status-badge" [class]="getStatusClass(cr.status)">
-              {{ getStatusIcon(cr.status) }} {{ cr.status }}
-            </span>
-          </td>
-          <td>{{ cr.type }}</td>
-          <td>{{ cr.releaseType }}</td>
-          <td>{{ cr.requestedBy }}</td>
-          <td>{{ cr.requestedDate | date:'shortDate' }}</td>
-          <td class="actions">
-            <a [routerLink]="['/change-requests', cr.id]" class="btn-action view">
-              👁️ View
-            </a>
-            <a [routerLink]="['/change-requests', cr.id, 'edit']" class="btn-action edit">
-              ✏️ Edit
-            </a>
-            <button (click)="exportToWord(cr)" class="btn-action export">
-              📥 Export
-            </button>
-            <button (click)="deleteChangeRequest(cr.id)" class="btn-action delete">
-              🗑️ Delete
-            </button>
-          </td>
-        </tr>
-      </tbody>
-    </table>
+    <!-- Change Requests Table Card -->
+    <div class="requests-card">
+      <div class="card-header">
+        <div class="header-left">
+          <span class="header-icon">📝</span>
+          <div class="header-text">
+            <h2 class="header-title">Change Requests</h2>
+            <p class="header-description">
+              Showing {{ filteredRequests.length }} of {{ changeRequests.length }} requests
+              <span *ngIf="isFilterActive()" class="filter-badge">Filtered</span>
+            </p>
+          </div>
+        </div>
+        
+        <div class="header-export">
+          <button class="btn-export" (click)="exportAllToExcel()" *ngIf="filteredRequests.length > 0">
+            <span class="btn-icon">📊</span>
+            <span>Export</span>
+          </button>
+        </div>
+      </div>
 
-    <div *ngIf="filteredRequests.length === 0" class="no-requests">
-      <div class="empty-state">
-        <div class="empty-icon">📝</div>
-        <h3>No Change Requests Found</h3>
-        <p>No change requests match your current filters.</p>
-        <p *ngIf="searchTerm || filterStatus !== 'all' || filterPriority !== 'all'">
-          Try adjusting your search or filters.
+      <!-- Table View -->
+      <div class="table-responsive">
+        <table class="cr-table">
+          <thead>
+            <tr>
+              <th width="12%">CR Number</th>
+              <th width="25%">Title & Description</th>
+              <th width="10%">Priority</th>
+              <th width="12%">Status</th>
+              <th width="10%">Type</th>
+              <th width="10%">Release</th>
+              <th width="11%">Requested By</th>
+              <th width="10%">Date</th>
+              <th width="10%">Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let cr of filteredRequests">
+              <td class="cr-number-cell">
+                <span class="cr-badge">{{ cr.crNumber }}</span>
+              </td>
+              
+              <td class="cr-title-cell">
+                <div class="title-wrapper">
+                  <span class="title-text">{{ cr.title }}</span>
+                  <span class="title-id">{{ cr.id }}</span>
+                </div>
+                <div class="description-text">{{ cr.description  }}{{ cr.description.length > 80 ? '...' : '' }}</div>
+              </td>
+              
+              <td>
+                <span class="priority-badge" [ngClass]="getPriorityClass(cr.priority)">
+                  {{ getPriorityIcon(cr.priority) }} {{ cr.priority }}
+                </span>
+              </td>
+              
+              <td>
+                <span class="status-badge" [ngClass]="getStatusClass(cr.status)">
+                  {{ getStatusIcon(cr.status) }} {{ cr.status }}
+                </span>
+              </td>
+              
+              <td>{{ cr.type }}</td>
+              <td>{{ cr.releaseType }}</td>
+              <td>
+                <div class="user-info">
+                  <span class="user-avatar">{{ cr.requestedBy.charAt(0) }}</span>
+                  <span class="user-name">{{ cr.requestedBy }}</span>
+                </div>
+              </td>
+              
+              <td>
+                <div class="date-info">
+                  <span class="date-value">{{ cr.requestedDate | date:'MMM dd, yyyy' }}</span>
+                  <span class="date-relative">{{ getRelativeDate(cr.requestedDate) }}</span>
+                </div>
+              </td>
+              
+              <td class="actions-cell">
+                <div class="action-buttons">
+                  <a [routerLink]="['/change-requests', cr.id]" class="action-btn view" title="View">👁️</a>
+                  <a [routerLink]="['/change-requests', cr.id, 'edit']" class="action-btn edit" title="Edit">✏️</a>
+                  <button (click)="exportToWord(cr)" class="action-btn export" title="Export">📥</button>
+                  <button (click)="deleteChangeRequest(cr.id)" class="action-btn delete" title="Delete">🗑️</button>
+                </div>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <!-- Empty State -->
+      <div *ngIf="filteredRequests.length === 0" class="empty-state">
+        <div class="empty-icon">📭</div>
+        <h3 class="empty-title">No Change Requests Found</h3>
+        <p class="empty-description">
+          <ng-container *ngIf="isFilterActive()">
+            No requests match your current filters. Try adjusting your search criteria.
+          </ng-container>
+          <ng-container *ngIf="!isFilterActive()">
+            Get started by creating your first change request.
+          </ng-container>
         </p>
-        <a routerLink="/change-requests/new" class="btn-create-large">
-          ➕ Create Your First Change Request
-        </a>
+        <div class="empty-actions">
+          <button *ngIf="isFilterActive()" class="btn-secondary" (click)="resetFilters()">
+            Clear Filters
+          </button>
+          <a routerLink="/change-requests/new" class="btn-primary">
+            <span class="btn-icon">➕</span>
+            Create Change Request
+          </a>
+        </div>
       </div>
     </div>
   </div>
+
+  <!-- Footer -->
+  <footer class="cr-footer">
+    <div class="footer-info">
+      <span class="footer-icon">💾</span>
+      <span>Last updated: {{ lastUpdated | date:'medium' }}</span>
+    </div>
+    <div class="footer-actions">
+      <a routerLink="/generator" class="footer-link">
+        <span>←</span>
+        Back to Generator
+      </a>
+    </div>
+  </footer>
 </div>

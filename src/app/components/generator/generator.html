@@ -1,98 +1,280 @@
-<div class="container">
-  <div class="controls">
-    <div class="form-group">
-      <label for="projectCode">Project Code:</label>
-      <input 
-        id="projectCode" 
-        type="text" 
-        [(ngModel)]="projectCode" 
-        class="form-control"
-        placeholder="Enter project code">
+<div class="generator-container">
+  <!-- Header Section -->
+  <header class="generator-header">
+    <div class="brand-section">
+      <div class="brand">
+        <span class="brand-icon">📚</span>
+        <span class="brand-name">DocGen</span>
+      </div>
+      <div class="header-content">
+        <h1 class="header-title">Documentation Requirements Generator</h1>
+        <p class="header-subtitle">Generate comprehensive documentation requirements for your product releases</p>
+      </div>
+    </div>
+    
+    <div class="project-summary">
+      <div class="summary-item">
+        <span class="summary-label">Project</span>
+        <span class="summary-value">{{ projectCode }}</span>
+      </div>
+      <div class="summary-divider"></div>
+      <div class="summary-item">
+        <span class="summary-label">Version</span>
+        <span class="summary-value">{{ releaseVersion }}</span>
+      </div>
+      <div class="summary-divider"></div>
+      <div class="summary-item">
+        <span class="summary-label">Release</span>
+        <span class="summary-value release-badge">{{ selectedReleaseType }}</span>
+      </div>
+    </div>
+  </header>
+
+  <!-- Main Content - Single Column -->
+  <div class="main-content">
+    <!-- Configuration Panel - Now at the top -->
+    <div class="config-card">
+      <div class="card-header">
+        <div class="header-left">
+          <span class="header-icon">⚙️</span>
+          <div class="header-text">
+            <h2 class="header-title">Configuration</h2>
+            <p class="header-description">Set your project parameters</p>
+          </div>
+        </div>
+        <div class="header-actions">
+          <button class="btn-reset" (click)="resetForm()">
+            <span class="btn-icon">↺</span>
+            <span>Reset</span>
+          </button>
+        </div>
+      </div>
+
+      <div class="config-grid">
+        <!-- Project Code -->
+        <div class="config-item">
+          <label for="projectCode" class="config-label">
+            <span class="label-icon">🏷️</span>
+            <span>Project Code</span>
+          </label>
+          <div class="input-wrapper">
+            <input 
+              id="projectCode" 
+              type="text" 
+              [(ngModel)]="projectCode" 
+              class="form-control"
+              placeholder="e.g., PROJ-001"
+              autocomplete="off"
+            >
+          </div>
+          <span class="input-hint">Unique project identifier</span>
+        </div>
+
+        <!-- Release Version -->
+        <div class="config-item">
+          <label for="releaseVersion" class="config-label">
+            <span class="label-icon">🔖</span>
+            <span>Release Version</span>
+          </label>
+          <div class="input-wrapper">
+            <input 
+              id="releaseVersion" 
+              type="text" 
+              [(ngModel)]="releaseVersion" 
+              class="form-control"
+              placeholder="e.g., v2.0.0"
+              autocomplete="off"
+            >
+          </div>
+          <span class="input-hint">Semantic versioning recommended</span>
+        </div>
+
+        <!-- Release Type -->
+        <div class="config-item">
+          <label for="releaseType" class="config-label">
+            <span class="label-icon">📌</span>
+            <span>Release Type</span>
+          </label>
+          <div class="select-wrapper">
+            <select 
+              id="releaseType" 
+              [(ngModel)]="selectedReleaseType" 
+              (change)="onReleaseTypeChange()"
+              class="form-control"
+            >
+              <option *ngFor="let type of releaseTypes" [value]="type.name">
+                {{ type.name }}
+              </option>
+            </select>
+            <span class="select-arrow">▼</span>
+          </div>
+          <span class="input-hint">Select release classification</span>
+        </div>
+
+        <!-- Document Filter Toggle -->
+        <div class="config-item filter-item">
+          <label class="config-label">
+            <span class="label-icon">👁️</span>
+            <span>Document Visibility</span>
+          </label>
+          <div class="filter-toggle" (click)="showAllDocuments = !showAllDocuments; onShowAllChange()">
+            <div class="toggle-track" [class.active]="showAllDocuments">
+              <div class="toggle-thumb" [class.active]="showAllDocuments"></div>
+            </div>
+            <span class="toggle-label">
+              {{ showAllDocuments ? 'Showing all documents' : 'Showing enabled documents only' }}
+            </span>
+          </div>
+        </div>
+
+        <!-- Generate Button - Full Width -->
+        <div class="config-item generate-item">
+          <button class="btn-generate" (click)="generateReport()" [disabled]="!projectCode || !releaseVersion">
+            <span class="btn-icon">📄</span>
+            <span class="btn-text">Generate Requirements Report</span>
+            <span class="btn-shortcut">⌘G</span>
+          </button>
+        </div>
+      </div>
     </div>
 
-    <div class="form-group">
-      <label for="releaseVersion">Release Version:</label>
-      <input 
-        id="releaseVersion" 
-        type="text" 
-        [(ngModel)]="releaseVersion" 
-        class="form-control"
-        placeholder="Enter release version">
+    <!-- Summary Cards -->
+    <div class="summary-cards">
+      <div class="summary-card total">
+        <div class="card-icon">📊</div>
+        <div class="card-content">
+          <span class="card-label">Total to Process</span>
+          <span class="card-value">{{ totalDocumentsToProcess }}</span>
+        </div>
+      </div>
+      <div class="summary-card new">
+        <div class="card-icon">🆕</div>
+        <div class="card-content">
+          <span class="card-label">New Documents</span>
+          <span class="card-value">{{ newDocumentsCount }}</span>
+        </div>
+      </div>
+      <div class="summary-card update">
+        <div class="card-icon">🔄</div>
+        <div class="card-content">
+          <span class="card-label">Up-version</span>
+          <span class="card-value">{{ upVersionDocumentsCount }}</span>
+        </div>
+      </div>
+      <div class="summary-card disabled">
+        <div class="card-icon">⏸️</div>
+        <div class="card-content">
+          <span class="card-label">Disabled</span>
+          <span class="card-value">{{ notApplicableCount }}</span>
+        </div>
+      </div>
     </div>
 
-    <div class="form-group">
-      <label for="releaseType">Release Type:</label>
-      <select 
-        id="releaseType" 
-        [(ngModel)]="selectedReleaseType" 
-        (change)="onReleaseTypeChange()"
-        class="form-control">
-        <option *ngFor="let type of releaseTypes" [value]="type.name">
-          {{ type.name }}
-        </option>
-      </select>
+    <!-- Documents Section -->
+    <div class="documents-card">
+      <div class="card-header">
+        <div class="header-left">
+          <span class="header-icon">📋</span>
+          <div class="header-text">
+            <h2 class="header-title">Documentation Requirements</h2>
+            <p class="header-description">
+              {{ selectedReleaseType }} release • 
+              {{ filteredDocuments.length }} of {{ allDocuments.length }} documents
+              <span *ngIf="!showAllDocuments" class="filter-hint">(disabled hidden)</span>
+            </p>
+          </div>
+        </div>
+        <a routerLink="/config" class="header-action">
+          <span>Configure</span>
+          <span>→</span>
+        </a>
+      </div>
+
+      <!-- Table View -->
+      <div class="table-responsive">
+        <table class="requirements-table">
+          <thead>
+            <tr>
+              <th>Document</th>
+              <th>Action Required</th>
+              <th>Up-version</th>
+              <th>Document ID</th>
+              <th>History</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let doc of filteredDocuments" [class.disabled]="!doc.enabled">
+              <td class="doc-name-cell">
+                <div class="doc-info">
+                  <span class="doc-icon" [class.disabled-icon]="!doc.enabled">
+                    {{ doc.enabled ? '📄' : '📕' }}
+                  </span>
+                  <span class="doc-name">{{ doc.documentName }}</span>
+                </div>
+              </td>
+              <td class="action-cell">
+                <div class="action-description">{{ getActionDescription(doc) }}</div>
+              </td>
+              <td>
+                <span class="badge" [class]="getBadgeClass(doc.docUpVersion)">
+                  {{ getShortVersion(doc.docUpVersion) }}
+                </span>
+              </td>
+              <td>
+                <span class="doc-id">{{ getShortDocId(doc.docId) }}</span>
+              </td>
+              <td>
+                <span class="history-badge" [class.yes]="doc.docHistory === 'Yes'" [class.no]="doc.docHistory === 'No'">
+                  {{ doc.docHistory === 'Yes' ? '✓' : '−' }}
+                </span>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <!-- Empty State -->
+      <div *ngIf="filteredDocuments.length === 0" class="empty-state">
+        <div class="empty-icon">📭</div>
+        <h3 class="empty-title">No documents required</h3>
+        <p class="empty-description">
+          This release type doesn't require any documentation updates.
+        </p>
+        <a routerLink="/config" class="empty-action">
+          <span>Configure documents</span>
+          <span>→</span>
+        </a>
+      </div>
     </div>
 
-    <div class="form-group checkbox-group">
-      <label class="checkbox-label">
-        <input 
-          type="checkbox" 
-          [(ngModel)]="showAllDocuments" 
-          (change)="onShowAllChange()"
-          class="checkbox-input">
-        Show all documents (including disabled)
-      </label>
+    <!-- Quick Configure Prompt -->
+    <div class="quick-config" *ngIf="filteredDocuments.length > 0">
+      <div class="quick-config-content">
+        <div class="quick-config-icon">⚡</div>
+        <div class="quick-config-text">
+          <strong>Need to customize?</strong>
+          <span>Adjust document requirements per release type</span>
+        </div>
+        <a routerLink="/config" class="quick-config-button">
+          Configure Documents
+          <span>→</span>
+        </a>
+      </div>
     </div>
-
-    <button class="btn-generate" (click)="generateReport()">
-      📄 Generate Requirements Report
-    </button>
   </div>
 
-  <div class="documents-table">
-    <h2>Documentation Requirements for {{ selectedReleaseType }}</h2>
-    <p class="document-count">
-      Showing {{ filteredDocuments.length }} of {{ allDocuments.length }} documents
-      <span *ngIf="!showAllDocuments" class="filter-note">(disabled documents are hidden)</span>
-    </p>
-    
-    <table class="requirements-table">
-      <thead>
-        <tr>
-          <th>Document Name</th>
-          <th>Action Required</th>
-          <th>Up-version</th>
-          <th>Document ID</th>
-          <th>History Update</th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr *ngFor="let doc of filteredDocuments" [class.disabled]="!doc.enabled">
-          <td class="doc-name">{{ doc.documentName }}</td>
-          <td class="action-description">{{ getActionDescription(doc) }}</td>
-          <td>{{ doc.docUpVersion }}</td>
-          <td>{{ doc.docId }}</td>
-          <td>{{ doc.docHistory }}</td>
-        </tr>
-      </tbody>
-    </table>
-
-    <div *ngIf="filteredDocuments.length === 0" class="no-documents">
-      <p>No documents required for this release type.</p>
-      <p><a routerLink="/config" class="config-link">Configure documents in settings</a></p>
+  <!-- Footer -->
+  <div class="generator-footer">
+    <div class="footer-info">
+      <span>Generated by: {{ authService.getCurrentUser()?.name || 'System' }}</span>
+      <span class="footer-separator">•</span>
+      <span>{{ currentDate | date:'medium' }}</span>
     </div>
-  </div>
-
-  <div class="summary">
-    <h3>Summary for {{ selectedReleaseType }}</h3>
-    <p>Total documents to process: {{ totalDocumentsToProcess }}</p>
-    <p>New documents: {{ newDocumentsCount }}</p>
-    <p>Documents to up-version: {{ upVersionDocumentsCount }}</p>
-    <p>Disabled documents: {{ notApplicableCount }}</p>
-    
-    <div class="config-prompt">
-      <p>Need to customize which documents are required?</p>
-      <a routerLink="/config" class="btn-config">⚙️ Configure Documents</a>
+    <div class="footer-actions">
+      <a routerLink="/change-requests" class="footer-link">
+        <span>📝</span>
+        View Change Requests
+      </a>
     </div>
   </div>
 </div>

@@ -1,0 +1,113 @@
+<nav class="sidebar" [class.collapsed]="collapsed">
+  <div class="sidebar-header">
+    <div class="logo-area">
+      <span class="logo-icon">📚</span>
+      <span class="logo-text" *ngIf="!collapsed">DocGen</span>
+    </div>
+    <button class="collapse-toggle" (click)="toggleCollapse()" aria-label="Toggle sidebar">
+      <span class="toggle-icon">{{ collapsed ? '→' : '←' }}</span>
+    </button>
+  </div>
+
+  <div class="sidebar-content">
+    <div class="nav-section">
+      <h3 class="nav-section-title" *ngIf="!collapsed">Main</h3>
+      <ul class="nav-list">
+        <li class="nav-item">
+          <a routerLink="/generator" routerLinkActive="active" #rlaGenerator="routerLinkActive" class="nav-link" [class.active]="rlaGenerator.isActive">
+            <span class="nav-icon">📋</span>
+            <span class="nav-label" *ngIf="!collapsed">Generator</span>
+            <span class="nav-tooltip" *ngIf="collapsed">Generator</span>
+          </a>
+        </li>
+        <li class="nav-item">
+          <a routerLink="/config" routerLinkActive="active" #rlaConfig="routerLinkActive" class="nav-link" [class.active]="rlaConfig.isActive">
+            <span class="nav-icon">⚙️</span>
+            <span class="nav-label" *ngIf="!collapsed">Configuration</span>
+            <span class="nav-tooltip" *ngIf="collapsed">Configuration</span>
+          </a>
+        </li>
+        <li class="nav-item">
+          <a routerLink="/change-requests" routerLinkActive="active" #rlaChange="routerLinkActive" class="nav-link" [class.active]="rlaChange.isActive">
+            <span class="nav-icon">📝</span>
+            <span class="nav-label" *ngIf="!collapsed">Change Requests</span>
+            <span class="nav-tooltip" *ngIf="collapsed">Change Requests</span>
+            <span class="nav-badge">3</span>
+          </a>
+        </li>
+      </ul>
+    </div>
+
+    <div class="nav-section" *ngIf="authService.isAdmin()">
+      <h3 class="nav-section-title" *ngIf="!collapsed">Administration</h3>
+      <ul class="nav-list">
+        <li class="nav-item">
+          <a routerLink="/admin/logs" routerLinkActive="active" #rlaAdmin="routerLinkActive" class="nav-link admin" [class.active]="rlaAdmin.isActive">
+            <span class="nav-icon">🔒</span>
+            <span class="nav-label" *ngIf="!collapsed">Admin Logs</span>
+            <span class="nav-tooltip" *ngIf="collapsed">Admin Logs</span>
+          </a>
+        </li>
+        <li class="nav-item" *ngIf="authService.isAdmin()">
+          <a routerLink="/admin/users" routerLinkActive="active" class="nav-link admin">
+            <span class="nav-icon">👥</span>
+            <span class="nav-label" *ngIf="!collapsed">User Management</span>
+            <span class="nav-tooltip" *ngIf="collapsed">User Management</span>
+          </a>
+        </li>
+        <li class="nav-item" *ngIf="authService.isAdmin()">
+          <a routerLink="/admin/analytics" routerLinkActive="active" class="nav-link admin">
+            <span class="nav-icon">📊</span>
+            <span class="nav-label" *ngIf="!collapsed">Analytics</span>
+            <span class="nav-tooltip" *ngIf="collapsed">Analytics</span>
+          </a>
+        </li>
+      </ul>
+    </div>
+
+    <div class="nav-section">
+      <h3 class="nav-section-title" *ngIf="!collapsed">Account</h3>
+      <ul class="nav-list">
+        <li class="nav-item">
+          <a routerLink="/profile" routerLinkActive="active" class="nav-link">
+            <span class="nav-icon">👤</span>
+            <span class="nav-label" *ngIf="!collapsed">Profile</span>
+            <span class="nav-tooltip" *ngIf="collapsed">Profile</span>
+          </a>
+        </li>
+        <li class="nav-item">
+          <a routerLink="/settings" routerLinkActive="active" class="nav-link">
+            <span class="nav-icon">⚡</span>
+            <span class="nav-label" *ngIf="!collapsed">Settings</span>
+            <span class="nav-tooltip" *ngIf="collapsed">Settings</span>
+          </a>
+        </li>
+        <li class="nav-item" *ngIf="!authService.getCurrentUser()">
+          <a routerLink="/login" routerLinkActive="active" class="nav-link login">
+            <span class="nav-icon">🔑</span>
+            <span class="nav-label" *ngIf="!collapsed">Sign In</span>
+            <span class="nav-tooltip" *ngIf="collapsed">Sign In</span>
+          </a>
+        </li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="sidebar-footer" *ngIf="authService.getCurrentUser() && !collapsed">
+    <div class="user-profile-mini">
+      <div class="user-avatar-small">
+        {{ authService.getCurrentUser()?.name?.charAt(0) || 'U' }}
+      </div>
+      <div class="user-info-mini">
+        <span class="user-name">{{ authService.getCurrentUser()?.name }}</span>
+        <!-- <span class="user-email">{{ authService.getCurrentUser()?.email || 'user@example.com' }}</span> -->
+      </div>
+    </div>
+  </div>
+
+  <div class="sidebar-footer-collapsed" *ngIf="authService.getCurrentUser() && collapsed">
+    <div class="user-avatar-tiny">
+      {{ authService.getCurrentUser()?.name?.charAt(0) || 'U' }}
+    </div>
+  </div>
+</nav>

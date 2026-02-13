@@ -1,16 +1,14 @@
 import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { RouterModule } from '@angular/router';
 
 @Component({
   selector: 'app-footer',
   standalone: true,
-  imports: [CommonModule],
-  template: `
-    <footer class="app-footer">
-      <div>© Documentation Generator — Built for concise release workflows</div>
-      <div class="meta">v1.0 • Minimal UI</div>
-    </footer>
-  `,
+  imports: [CommonModule, RouterModule],
+  templateUrl: './footer.component.html',
   styleUrls: ['./footer.component.scss']
 })
-export class FooterComponent {}
+export class FooterComponent {
+  currentYear = new Date().getFullYear();
+}

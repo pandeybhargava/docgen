@@ -1,22 +1,36 @@
-import { Component } from '@angular/core';
+import { Component, HostListener, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
+import { AuthService } from '../../auth/auth.service';
 
 @Component({
   selector: 'app-sidebar',
   standalone: true,
   imports: [CommonModule, RouterModule],
-  template: `
-    <nav class="app-sidebar">
-      <ul>
-        <li><a routerLink="/generator" routerLinkActive="active">Generator</a></li>
-        <li><a routerLink="/config" routerLinkActive="active">Configuration</a></li>
-        <li><a routerLink="/change-requests" routerLinkActive="active">Change Requests</a></li>
-        <li><a routerLink="/admin/logs" routerLinkActive="active">Admin Logs</a></li>
-        <li><a routerLink="/login" routerLinkActive="active">Login</a></li>
-      </ul>
-    </nav>
-  `,
+  templateUrl: './sidebar.component.html',
   styleUrls: ['./sidebar.component.scss']
 })
-export class SidebarComponent {}
+export class SidebarComponent implements OnInit {
+  collapsed = false;
+  isMobileView = false;
+
+  constructor(public authService: AuthService) {}
+
+  ngOnInit() {
+    this.checkViewport();
+  }
+
+  @HostListener('window:resize')
+  checkViewport() {
+    this.isMobileView = window.innerWidth < 900;
+    if (this.isMobileView) {
+      this.collapsed = true;
+    }
+  }
+
+  toggleCollapse() {
+    if (!this.isMobileView) {
+      this.collapsed = !this.collapsed;
+    }
+  }
+}

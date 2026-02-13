@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, HostListener } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router, RouterModule } from '@angular/router';
 import { AuthService } from '../../auth/auth.service';
@@ -7,30 +7,30 @@ import { AuthService } from '../../auth/auth.service';
   selector: 'app-header',
   standalone: true,
   imports: [CommonModule, RouterModule],
-  template: `
-    <header class="app-header">
-      <div class="brand">
-        <h1>Documentation Requirements Generator</h1>
-        <p class="subtitle">Generate documentation requirements for your product releases</p>
-      </div>
-
-      <nav class="top-nav">
-        <a routerLink="/generator" routerLinkActive="active">📋 Generator</a>
-        <a routerLink="/config" routerLinkActive="active">⚙️ Configuration</a>
-        <a routerLink="/change-requests" routerLinkActive="active">📝 Change Requests</a>
-        <a *ngIf="authService.isAdmin()" routerLink="/admin/logs" routerLinkActive="active">🔒 Admin Logs</a>
-        <a class="logout" *ngIf="authService.getCurrentUser()" (click)="logout()">🚪 Logout ({{ authService.getCurrentUser()?.name }})</a>
-        <a class="login" *ngIf="!authService.getCurrentUser()" routerLink="/login">🔑 Login</a>
-      </nav>
-    </header>
-  `,
+  templateUrl: './header.component.html',
   styleUrls: ['./header.component.scss']
 })
 export class HeaderComponent {
+  showUserMenu: boolean = false;
+  pendingChangeRequests: number = 3; // This would come from a service
+
   constructor(public authService: AuthService, private router: Router) {}
 
-  logout() {
+  toggleUserMenu(): void {
+    this.showUserMenu = !this.showUserMenu;
+  }
+
+  @HostListener('document:click', ['$event'])
+  onDocumentClick(event: MouseEvent): void {
+    const target = event.target as HTMLElement;
+    if (!target.closest('.user-dropdown')) {
+      this.showUserMenu = false;
+    }
+  }
+
+  logout(): void {
     this.authService.logout();
     this.router.navigate(['/login']);
+    this.showUserMenu = false;
   }
 }

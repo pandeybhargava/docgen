@@ -1,0 +1,44 @@
+<footer class="app-footer">
+  <div class="footer-content">
+    <div class="footer-brand">
+      <span class="brand-icon">📚</span>
+      <span class="brand-name">DocGen</span>
+      <span class="brand-separator">•</span>
+      <span class="brand-tagline">Documentation Requirements Generator</span>
+    </div>
+
+    <div class="footer-links">
+      <a routerLink="/about" class="footer-link">About</a>
+      <span class="link-separator">|</span>
+      <a routerLink="/privacy" class="footer-link">Privacy</a>
+      <span class="link-separator">|</span>
+      <a routerLink="/terms" class="footer-link">Terms</a>
+      <span class="link-separator">|</span>
+      <a routerLink="/support" class="footer-link">Support</a>
+    </div>
+
+    <div class="footer-meta">
+      <div class="version-info">
+        <span class="meta-label">Version</span>
+        <span class="meta-value">2.0.0</span>
+      </div>
+      <div class="meta-separator"></div>
+      <div class="build-info">
+        <span class="meta-label">Build</span>
+        <span class="meta-value">{{ currentYear }}</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="footer-bottom">
+    <div class="copyright">
+      <span class="copyright-icon">©</span>
+      <span>{{ currentYear }} Documentation Generator. All rights reserved.</span>
+    </div>
+    
+    <div class="status-indicator">
+      <span class="status-dot"></span>
+      <span class="status-text">All systems operational</span>
+    </div>
+  </div>
+</footer>

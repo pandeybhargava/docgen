@@ -1,0 +1,82 @@
+<header class="app-header">
+  <div class="header-container">
+    <!-- Logo/Brand Section -->
+    <div class="brand-section">
+      <a routerLink="/" class="brand-link">
+        <span class="brand-icon">📚</span>
+        <div class="brand-text">
+          <span class="brand-name">DocGen</span>
+          <span class="brand-tagline">Documentation Requirements Generator</span>
+        </div>
+      </a>
+    </div>
+
+    <!-- Main Navigation - All in one line -->
+    <nav class="main-nav">
+      <a routerLink="/generator" routerLinkActive="active" class="nav-link">
+        <span class="nav-icon">📋</span>
+        <span class="nav-text">Generator</span>
+      </a>
+      <a routerLink="/config" routerLinkActive="active" class="nav-link">
+        <span class="nav-icon">⚙️</span>
+        <span class="nav-text">Configuration</span>
+      </a>
+      <a routerLink="/change-requests" routerLinkActive="active" class="nav-link">
+        <span class="nav-icon">📝</span>
+        <span class="nav-text">Change Requests</span>
+        <span class="nav-badge" *ngIf="pendingChangeRequests > 0">{{ pendingChangeRequests }}</span>
+      </a>
+      <a *ngIf="authService.isAdmin()" routerLink="/admin/logs" routerLinkActive="active" class="nav-link admin">
+        <span class="nav-icon">🔒</span>
+        <span class="nav-text">Admin Logs</span>
+      </a>
+    </nav>
+
+    <!-- User Section -->
+    <div class="user-section" *ngIf="authService.getCurrentUser(); else loginSection">
+      <div class="user-dropdown">
+        <button class="user-button" (click)="toggleUserMenu()">
+          <div class="user-avatar">
+            {{ authService.getCurrentUser()?.name?.charAt(0) || 'U' }}
+          </div>
+          <div class="user-info">
+            <span class="user-name">{{ authService.getCurrentUser()?.name }}</span>
+            <span class="user-role" *ngIf="authService.isAdmin()">Administrator</span>
+            <span class="user-role" *ngIf="!authService.isAdmin()">User</span>
+          </div>
+          <span class="dropdown-arrow">▼</span>
+        </button>
+        
+        <div class="dropdown-menu" *ngIf="showUserMenu">
+          <div class="dropdown-header">
+            <div class="dropdown-user">
+              <span class="dropdown-user-name">{{ authService.getCurrentUser()?.name }}</span>
+              <!-- <span class="dropdown-user-email">{{ authService.getCurrentUser()?.email || 'user@docgen.com' }}</span> -->
+            </div>
+          </div>
+          <div class="dropdown-divider"></div>
+          <a routerLink="/profile" class="dropdown-item">
+            <span class="item-icon">👤</span>
+            <span>Profile</span>
+          </a>
+          <a routerLink="/settings" class="dropdown-item">
+            <span class="item-icon">⚙️</span>
+            <span>Settings</span>
+          </a>
+          <div class="dropdown-divider"></div>
+          <button (click)="logout()" class="dropdown-item logout">
+            <span class="item-icon">🚪</span>
+            <span>Logout</span>
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <ng-template #loginSection>
+      <a routerLink="/login" class="login-button">
+        <span class="nav-icon">🔑</span>
+        <span>Sign In</span>
+      </a>
+    </ng-template>
+  </div>
+</header>

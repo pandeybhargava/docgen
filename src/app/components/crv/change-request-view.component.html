@@ -1,394 +1,470 @@
-<div class="container">
-  <div *ngIf="isLoading" class="loading">
+<div class="cr-view-container">
+  <!-- Loading State -->
+  <div *ngIf="isLoading" class="loading-state">
     <div class="spinner"></div>
     <p>Loading Change Request...</p>
   </div>
 
-   <div *ngIf="!isLoading && errorMessage" class="error">
+  <!-- Error State -->
+  <div *ngIf="!isLoading && errorMessage" class="error-state">
     <div class="error-icon">❌</div>
     <h3>Error Loading Change Request</h3>
     <p>{{ errorMessage }}</p>
-    <p>Redirecting to Change Requests list...</p>
-    <button (click)="goBack()" class="btn-back-error">
+    <p class="error-hint">Redirecting to Change Requests list...</p>
+    <button (click)="goBack()" class="btn-error">
       ← Go Back Now
     </button>
   </div>
+
+  <!-- Main Content -->
   <div *ngIf="!isLoading && changeRequest" class="cr-view">
-    <!-- Header -->
-    <header class="header">
-      <div class="header-content">
-        <div class="header-left">
+    <!-- Header Section -->
+    <header class="cr-header">
+      <div class="brand-section">
+        <div class="brand">
+          <span class="brand-icon">📋</span>
+          <span class="brand-name">DocGen</span>
+        </div>
+        <div class="header-content">
           <button (click)="goBack()" class="btn-back">
-            ← Back to List
+            <span>←</span>
+            <span>Back to List</span>
           </button>
-          <h1>{{ changeRequest.crNumber }}</h1>
-          <h2>{{ changeRequest.title }}</h2>
-          <div class="header-meta">
-            <span class="status-badge" [class]="getStatusClass(changeRequest.status)">
-              {{ changeRequest.status }}
-            </span>
-            <span class="priority-badge" [class]="getPriorityClass(changeRequest.priority)">
-              {{ changeRequest.priority }} Priority
-            </span>
-            <span class="meta-item">📅 {{ changeRequest.requestedDate | date:'mediumDate' }}</span>
-            <span class="meta-item">👤 {{ changeRequest.requestedBy }}</span>
-          </div>
         </div>
-        <div class="header-right">
-          <div class="header-actions">
-            <button (click)="exportToWord()" class="btn-action export">
-              📥 Export to Word
-            </button>
-            <button *ngIf="canEdit()" (click)="editChangeRequest()" class="btn-action edit">
-              ✏️ Edit
-            </button>
-            <button *ngIf="canDelete()" (click)="deleteChangeRequest()" class="btn-action delete">
-              🗑️ Delete
-            </button>
-          </div>
-          <!-- site navigation removed: use shared header component -->
-        </div>
-      </div>
-      </header>
-      <div class="page-header">
-        <h2>Change Request: {{ changeRequest?.title }}</h2>
-        <nav class="nav-inline">
-          <a class="nav-btn" routerLink="/change-requests">Back to List</a>
-          <a class="nav-btn" [routerLink]="['/change-requests', changeRequest?.id, 'edit']">Edit</a>
-        </nav>
       </div>
 
-    <!-- Tabs -->
-    <div class="tabs">
-      <button 
-        [class.active]="activeTab === 'overview'" 
-        (click)="setActiveTab('overview')" 
-        class="tab-btn">
-        📋 Overview
-      </button>
-      <button 
-        [class.active]="activeTab === 'documents'" 
-        (click)="setActiveTab('documents')" 
-        class="tab-btn">
-        📄 Documents
-      </button>
-      <button 
-        [class.active]="activeTab === 'stakeholders'" 
-        (click)="setActiveTab('stakeholders')" 
-        class="tab-btn">
-        👥 Stakeholders
-      </button>
-      <button 
-        [class.active]="activeTab === 'history'" 
-        (click)="setActiveTab('history')" 
-        class="tab-btn">
-        📜 History
-      </button>
-      <button 
-        [class.active]="activeTab === 'attachments'" 
-        (click)="setActiveTab('attachments')" 
-        class="tab-btn">
-        📎 Attachments
-      </button>
-      <button 
-        [class.active]="activeTab === 'risk'" 
-        (click)="setActiveTab('risk')" 
-        class="tab-btn">
-        ⚠️ Risk Assessment
-      </button>
+      <div class="cr-title-section">
+        <div class="title-left">
+          <div class="cr-badge">{{ changeRequest.crNumber }}</div>
+          <h1 class="cr-title">{{ changeRequest.title }}</h1>
+        </div>
+        <div class="title-right">
+          <div class="header-actions">
+            <button (click)="exportToWord()" class="btn-export">
+              <span class="btn-icon">📥</span>
+              <span>Export</span>
+            </button>
+            <button *ngIf="canEdit()" (click)="editChangeRequest()" class="btn-edit">
+              <span class="btn-icon">✏️</span>
+              <span>Edit</span>
+            </button>
+            <button *ngIf="canDelete()" (click)="deleteChangeRequest()" class="btn-delete">
+              <span class="btn-icon">🗑️</span>
+              <span>Delete</span>
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <div class="cr-meta-grid">
+        <div class="meta-item">
+          <span class="meta-icon">📊</span>
+          <div class="meta-content">
+            <span class="meta-label">Status</span>
+            <span class="status-badge" [ngClass]="getStatusClass(changeRequest.status)">
+              {{ getStatusIcon(changeRequest.status) }} {{ changeRequest.status }}
+            </span>
+          </div>
+        </div>
+
+        <div class="meta-item">
+          <span class="meta-icon">⚠️</span>
+          <div class="meta-content">
+            <span class="meta-label">Priority</span>
+            <span class="priority-badge" [ngClass]="getPriorityClass(changeRequest.priority)">
+              {{ getPriorityIcon(changeRequest.priority) }} {{ changeRequest.priority }}
+            </span>
+          </div>
+        </div>
+
+        <div class="meta-item">
+          <span class="meta-icon">📅</span>
+          <div class="meta-content">
+            <span class="meta-label">Requested Date</span>
+            <span class="meta-value">{{ changeRequest.requestedDate | date:'mediumDate' }}</span>
+          </div>
+        </div>
+
+        <div class="meta-item">
+          <span class="meta-icon">👤</span>
+          <div class="meta-content">
+            <span class="meta-label">Requested By</span>
+            <span class="meta-value">{{ changeRequest.requestedBy }}</span>
+          </div>
+        </div>
+
+        <div class="meta-item">
+          <span class="meta-icon">📦</span>
+          <div class="meta-content">
+            <span class="meta-label">Release Type</span>
+            <span class="meta-value release-badge">{{ changeRequest.releaseType }}</span>
+          </div>
+        </div>
+
+        <div class="meta-item">
+          <span class="meta-icon">🔖</span>
+          <div class="meta-content">
+            <span class="meta-label">Target Version</span>
+            <span class="meta-value">{{ changeRequest.targetVersion || 'Not specified' }}</span>
+          </div>
+        </div>
+      </div>
+    </header>
+
+    <!-- Quick Stats Cards -->
+    <div class="quick-stats">
+      <div class="stat-card documents">
+        <div class="stat-icon">📄</div>
+        <div class="stat-content">
+          <span class="stat-value">{{ getCompletedDocuments() }}/{{ changeRequest.impactedDocuments.length }}</span>
+          <span class="stat-label">Documents Completed</span>
+          <div class="progress-bar">
+            <div class="progress-fill" [style.width.%]="getDocumentProgress()"></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="stat-card stakeholders">
+        <div class="stat-icon">👥</div>
+        <div class="stat-content">
+          <span class="stat-value">{{ getApprovedStakeholders() }}/{{ changeRequest.stakeholders.length }}</span>
+          <span class="stat-label">Stakeholders Approved</span>
+          <div class="progress-bar">
+            <div class="progress-fill" [style.width.%]="getApprovalProgress()"></div>
+          </div>
+        </div>
+      </div>
     </div>
 
-    <!-- Tab Content -->
-    <div class="tab-content">
-      
-      <!-- Overview Tab -->
-      <div *ngIf="activeTab === 'overview'" class="tab-pane overview">
-        <div class="overview-grid">
-          <div class="overview-card">
-            <h3>📝 Description</h3>
-            <div class="card-content">
-              <p>{{ changeRequest.description }}</p>
-            </div>
-          </div>
-          
-          <div class="overview-card">
-            <h3>🏷️ Details</h3>
-            <div class="details-grid">
-              <div class="detail-item">
-                <span class="detail-label">Type:</span>
-                <span class="detail-value">{{ changeRequest.type }}</span>
-              </div>
-              <div class="detail-item">
-                <span class="detail-label">Release Type:</span>
-                <span class="detail-value">{{ changeRequest.releaseType }}</span>
-              </div>
-              <div class="detail-item">
-                <span class="detail-label">Target Version:</span>
-                <span class="detail-value">{{ changeRequest.targetVersion || 'Not specified' }}</span>
-              </div>
-              <div class="detail-item">
-                <span class="detail-label">Documents Required:</span>
-                <span class="detail-value">{{ changeRequest.documentsRequired.length }}</span>
-              </div>
-              <div class="detail-item">
-                <span class="detail-label">Stakeholders:</span>
-                <span class="detail-value">{{ changeRequest.stakeholders.length }}</span>
-              </div>
-              <div class="detail-item">
-                <span class="detail-label">History Entries:</span>
-                <span class="detail-value">{{ changeRequest.history.length }}</span>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <!-- Quick Stats -->
-        <div class="quick-stats">
-          <div class="stat-card">
-            <div class="stat-icon">📄</div>
-            <div class="stat-content">
-              <h4>Documents Progress</h4>
-              <div class="progress-bar">
-                <div class="progress-fill" [style.width.%]="getDocumentProgress()"></div>
-              </div>
-              <p class="stat-text">{{ getCompletedDocuments() }}/{{ changeRequest.impactedDocuments.length }} completed</p>
-            </div>
-          </div>
-          
-          <div class="stat-card">
-            <div class="stat-icon">👥</div>
-            <div class="stat-content">
-              <h4>Stakeholder Approval</h4>
-              <div class="progress-bar">
-                <div class="progress-fill" [style.width.%]="getApprovalProgress()"></div>
-              </div>
-              <p class="stat-text">{{ getApprovedStakeholders() }}/{{ changeRequest.stakeholders.length }} approved</p>
-            </div>
-          </div>
-        </div>
-
-        <!-- Comments Section -->
-        <div class="comments-section">
-          <h3>💬 Comments & Discussion</h3>
-          <div class="comment-input">
-            <textarea 
-              [(ngModel)]="newComment" 
-              placeholder="Add a comment..."
-              rows="3"
-              class="comment-textarea">
-            </textarea>
-            <button (click)="addComment()" class="btn-comment">
-              Add Comment
-            </button>
-          </div>
-          
-          <div class="comments-list">
-            <div *ngFor="let entry of changeRequest.history.slice().reverse()" class="comment">
-              <div class="comment-header">
-                <span class="comment-user">{{ entry.user }}</span>
-                <span class="comment-date">{{ entry.date | date:'medium' }}</span>
-              </div>
-              <div class="comment-action">{{ entry.action }}</div>
-              <div *ngIf="entry.comments" class="comment-text">{{ entry.comments }}</div>
-            </div>
-          </div>
-        </div>
+    <!-- Tabs Navigation -->
+    <div class="tabs-container">
+      <div class="tabs">
+        <button 
+          class="tab-btn" 
+          [class.active]="activeTab === 'overview'" 
+          (click)="setActiveTab('overview')">
+          <span class="tab-icon">📋</span>
+          <span class="tab-label">Overview</span>
+        </button>
+        <button 
+          class="tab-btn" 
+          [class.active]="activeTab === 'documents'" 
+          (click)="setActiveTab('documents')">
+          <span class="tab-icon">📄</span>
+          <span class="tab-label">Documents</span>
+          <span class="tab-badge">{{ changeRequest.documentsRequired.length }}</span>
+        </button>
+        <button 
+          class="tab-btn" 
+          [class.active]="activeTab === 'stakeholders'" 
+          (click)="setActiveTab('stakeholders')">
+          <span class="tab-icon">👥</span>
+          <span class="tab-label">Stakeholders</span>
+          <span class="tab-badge">{{ changeRequest.stakeholders.length }}</span>
+        </button>
+        <button 
+          class="tab-btn" 
+          [class.active]="activeTab === 'history'" 
+          (click)="setActiveTab('history')">
+          <span class="tab-icon">📜</span>
+          <span class="tab-label">History</span>
+          <span class="tab-badge">{{ changeRequest.history.length }}</span>
+        </button>
+        <button 
+          class="tab-btn" 
+          [class.active]="activeTab === 'attachments'" 
+          (click)="setActiveTab('attachments')">
+          <span class="tab-icon">📎</span>
+          <span class="tab-label">Attachments</span>
+          <span class="tab-badge">{{ changeRequest.attachments.length }}</span>
+        </button>
+        <button 
+          class="tab-btn" 
+          [class.active]="activeTab === 'risk'" 
+          (click)="setActiveTab('risk')">
+          <span class="tab-icon">⚠️</span>
+          <span class="tab-label">Risk Assessment</span>
+        </button>
       </div>
 
-      <!-- Documents Tab -->
-      <div *ngIf="activeTab === 'documents'" class="tab-pane documents">
-        <div class="section-header">
-          <h3>📄 Required Documents</h3>
-          <span class="section-subtitle">{{ changeRequest.documentsRequired.length }} documents required for {{ changeRequest.releaseType }}</span>
-        </div>
-        
-        <div class="documents-list">
-          <div *ngFor="let doc of changeRequest.impactedDocuments" class="document-card">
-            <div class="document-header">
-              <h4>{{ doc.documentName }}</h4>
-              <span class="doc-status" [class]="getDocumentStatusClass(doc.status)">
-                {{ doc.status }}
-              </span>
+      <!-- Tab Content -->
+      <div class="tab-content">
+        <!-- Overview Tab -->
+        <div *ngIf="activeTab === 'overview'" class="tab-pane">
+          <div class="overview-grid">
+            <div class="card description-card">
+              <div class="card-header">
+                <span class="card-icon">📝</span>
+                <h3 class="card-title">Description</h3>
+              </div>
+              <div class="card-body">
+                <p class="description-text">{{ changeRequest.description }}</p>
+              </div>
             </div>
-            <div class="document-body">
-              <p><strong>Action Required:</strong> {{ doc.action }}</p>
+
+            <div class="card details-card">
+              <div class="card-header">
+                <span class="card-icon">🏷️</span>
+                <h3 class="card-title">Details</h3>
+              </div>
+              <div class="card-body">
+                <div class="details-grid">
+                  <div class="detail-row">
+                    <span class="detail-label">Type:</span>
+                    <span class="detail-value">{{ changeRequest.type }}</span>
+                  </div>
+                  <div class="detail-row">
+                    <span class="detail-label">Documents Required:</span>
+                    <span class="detail-value">{{ changeRequest.documentsRequired.length }}</span>
+                  </div>
+                  <div class="detail-row">
+                    <span class="detail-label">Stakeholders:</span>
+                    <span class="detail-value">{{ changeRequest.stakeholders.length }}</span>
+                  </div>
+                  <div class="detail-row">
+                    <span class="detail-label">History Entries:</span>
+                    <span class="detail-value">{{ changeRequest.history.length }}</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Comments Section -->
+          <div class="card comments-card">
+            <div class="card-header">
+              <span class="card-icon">💬</span>
+              <h3 class="card-title">Comments & Discussion</h3>
+            </div>
+            <div class="card-body">
+              <div class="comment-input">
+                <textarea 
+                  [(ngModel)]="newComment" 
+                  placeholder="Add a comment..."
+                  rows="3"
+                  class="comment-textarea">
+                </textarea>
+                <button (click)="addComment()" class="btn-comment" [disabled]="!newComment.trim()">
+                  <span class="btn-icon">💬</span>
+                  <span>Add Comment</span>
+                </button>
+              </div>
+              
+              <div class="comments-list">
+                <div *ngFor="let entry of changeRequest.history.slice().reverse()" class="comment-item">
+                  <div class="comment-avatar">{{ entry.user.charAt(0) }}</div>
+                  <div class="comment-content">
+                    <div class="comment-header">
+                      <span class="comment-user">{{ entry.user }}</span>
+                      <span class="comment-date">{{ entry.date | date:'medium' }}</span>
+                    </div>
+                    <div class="comment-action">{{ entry.action }}</div>
+                    <div *ngIf="entry.comments" class="comment-text">{{ entry.comments }}</div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Documents Tab -->
+        <div *ngIf="activeTab === 'documents'" class="tab-pane">
+          <div class="documents-grid">
+            <div *ngFor="let doc of changeRequest.impactedDocuments" class="document-card">
+              <div class="document-header">
+                <span class="document-icon">📄</span>
+                <h4 class="document-name">{{ doc.documentName }}</h4>
+                <span class="document-status" [ngClass]="getDocumentStatusClass(doc.status)">
+                  {{ doc.status }}
+                </span>
+              </div>
+              <div class="document-body">
+                <p class="document-action"><span class="label">Action:</span> {{ doc.action }}</p>
+              </div>
               <div class="document-actions">
-                <button class="btn-doc-action">📝 Update Status</button>
-                <button class="btn-doc-action">📄 View Template</button>
-                <button class="btn-doc-action">📥 Download</button>
+                <button class="btn-doc-action">
+                  <span class="btn-icon">📝</span>
+                  <span>Update Status</span>
+                </button>
+                <button class="btn-doc-action">
+                  <span class="btn-icon">📄</span>
+                  <span>View Template</span>
+                </button>
+                <button class="btn-doc-action">
+                  <span class="btn-icon">📥</span>
+                  <span>Download</span>
+                </button>
               </div>
             </div>
           </div>
         </div>
-      </div>
 
-      <!-- Stakeholders Tab -->
-      <div *ngIf="activeTab === 'stakeholders'" class="tab-pane stakeholders">
-        <div class="section-header">
-          <h3>👥 Stakeholders & Approvers</h3>
-          <span class="section-subtitle">Approval progress: {{ getApprovedStakeholders() }}/{{ changeRequest.stakeholders.length }}</span>
-        </div>
-        
-        <div class="stakeholders-list">
-          <div *ngFor="let stakeholder of changeRequest.stakeholders" class="stakeholder-card">
-            <div class="stakeholder-header">
+        <!-- Stakeholders Tab -->
+        <div *ngIf="activeTab === 'stakeholders'" class="tab-pane">
+          <div class="stakeholders-grid">
+            <div *ngFor="let stakeholder of changeRequest.stakeholders" class="stakeholder-card">
+              <div class="stakeholder-avatar">{{ stakeholder.name.charAt(0) }}</div>
               <div class="stakeholder-info">
-                <h4>{{ stakeholder.name }}</h4>
+                <h4 class="stakeholder-name">{{ stakeholder.name }}</h4>
                 <span class="stakeholder-role">{{ stakeholder.role }}</span>
                 <span class="stakeholder-dept">{{ stakeholder.department }}</span>
               </div>
-              <span class="stakeholder-status" [class]="getStakeholderStatusClass(stakeholder.status)">
-                {{ stakeholder.status }}
-              </span>
-            </div>
-            
-            <div *ngIf="stakeholder.comments" class="stakeholder-comments">
-              <p><strong>Comments:</strong> {{ stakeholder.comments }}</p>
-            </div>
-            
-            <div *ngIf="stakeholder.date" class="stakeholder-date">
-              <small>Updated: {{ stakeholder.date | date:'medium' }}</small>
-            </div>
-          </div>
-        </div>
-
-        <!-- Approval Section (if approver) -->
-        <div *ngIf="isApprover() && changeRequest.status === 'Under Review'" class="approval-section">
-          <h3>✅ Approval Decision</h3>
-          <div class="approval-form">
-            <textarea 
-              [(ngModel)]="approvalComment" 
-              placeholder="Enter your approval comments..."
-              rows="3"
-              class="approval-textarea">
-            </textarea>
-            <div class="approval-buttons">
-              <button (click)="approveChangeRequest()" class="btn-approve">
-                ✅ Approve
-              </button>
-              <button (click)="rejectChangeRequest()" class="btn-reject">
-                ❌ Reject
-              </button>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <!-- History Tab -->
-      <div *ngIf="activeTab === 'history'" class="tab-pane history">
-        <div class="section-header">
-          <h3>📜 Activity History</h3>
-          <span class="section-subtitle">{{ changeRequest.history.length }} activities recorded</span>
-        </div>
-        
-        <div class="history-timeline">
-          <div *ngFor="let entry of changeRequest.history.slice().reverse()" class="timeline-item">
-            <div class="timeline-date">{{ entry.date | date:'medium' }}</div>
-            <div class="timeline-content">
-              <div class="timeline-header">
-                <span class="timeline-user">{{ entry.user }}</span>
-                <span class="timeline-action">{{ entry.action }}</span>
+              <div class="stakeholder-status">
+                <span class="status-badge small" [ngClass]="getStakeholderStatusClass(stakeholder.status)">
+                  {{ stakeholder.status }}
+                </span>
               </div>
-              <div *ngIf="entry.comments" class="timeline-comments">
-                {{ entry.comments }}
+            </div>
+          </div>
+
+          <!-- Approval Section -->
+          <div *ngIf="isApprover() && changeRequest.status === 'Under Review'" class="approval-card">
+            <h3 class="approval-title">✅ Approval Decision</h3>
+            <div class="approval-form">
+              <textarea 
+                [(ngModel)]="approvalComment" 
+                placeholder="Enter your approval comments..."
+                rows="3"
+                class="approval-textarea">
+              </textarea>
+              <div class="approval-buttons">
+                <button (click)="approveChangeRequest()" class="btn-approve" [disabled]="!approvalComment.trim()">
+                  <span class="btn-icon">✅</span>
+                  <span>Approve</span>
+                </button>
+                <button (click)="rejectChangeRequest()" class="btn-reject" [disabled]="!approvalComment.trim()">
+                  <span class="btn-icon">❌</span>
+                  <span>Reject</span>
+                </button>
               </div>
             </div>
           </div>
         </div>
-      </div>
 
-      <!-- Attachments Tab -->
-      <div *ngIf="activeTab === 'attachments'" class="tab-pane attachments">
-        <div class="section-header">
-          <h3>📎 Attachments</h3>
-          <span class="section-subtitle">{{ changeRequest.attachments.length }} files attached</span>
-        </div>
-        
-        <div class="attachments-list">
-          <div *ngFor="let file of changeRequest.attachments" class="attachment-card">
-            <div class="attachment-icon">
-              <span *ngIf="file.type.includes('pdf')">📕</span>
-              <span *ngIf="file.type.includes('word') || file.type.includes('document')">📘</span>
-              <span *ngIf="file.type.includes('excel') || file.type.includes('spreadsheet')">📗</span>
-              <span *ngIf="file.type.includes('image')">🖼️</span>
-              <span *ngIf="!file.type.includes('pdf') && !file.type.includes('word') && !file.type.includes('excel') && !file.type.includes('image')">📄</span>
-            </div>
-            <div class="attachment-info">
-              <h4>{{ file.name }}</h4>
-              <p class="attachment-meta">
-                Size: {{ file.size }} • 
-                Type: {{ file.type }} • 
-                Uploaded by: {{ file.uploadedBy }} • 
-                {{ file.date | date:'shortDate' }}
-              </p>
-            </div>
-            <div class="attachment-actions">
-              <button class="btn-attachment">📥 Download</button>
-              <button class="btn-attachment">👁️ Preview</button>
+        <!-- History Tab -->
+        <div *ngIf="activeTab === 'history'" class="tab-pane">
+          <div class="timeline">
+            <div *ngFor="let entry of changeRequest.history.slice().reverse()" class="timeline-item">
+              <div class="timeline-marker"></div>
+              <div class="timeline-content">
+                <div class="timeline-header">
+                  <span class="timeline-user">{{ entry.user }}</span>
+                  <span class="timeline-date">{{ entry.date | date:'medium' }}</span>
+                </div>
+                <div class="timeline-action">{{ entry.action }}</div>
+                <div *ngIf="entry.comments" class="timeline-comments">{{ entry.comments }}</div>
+              </div>
             </div>
           </div>
         </div>
-      </div>
 
-      <!-- Risk Assessment Tab -->
-      <div *ngIf="activeTab === 'risk'" class="tab-pane risk">
-        <div class="section-header">
-          <h3>⚠️ Risk Assessment</h3>
-          <span class="section-subtitle">Risk Level: 
-            <span class="risk-level" [class]="'risk-' + changeRequest.riskAssessment.riskLevel.toLowerCase()">
-              {{ changeRequest.riskAssessment.riskLevel }}
-            </span>
-          </span>
+        <!-- Attachments Tab -->
+        <div *ngIf="activeTab === 'attachments'" class="tab-pane">
+          <div class="attachments-grid">
+            <div *ngFor="let file of changeRequest.attachments" class="attachment-card">
+              <div class="attachment-icon">{{ getFileIcon(file.type) }}</div>
+              <div class="attachment-info">
+                <h4 class="attachment-name">{{ file.name }}</h4>
+                <p class="attachment-meta">
+                  Size: {{ file.size }} • Type: {{ file.type }} • 
+                  Uploaded by: {{ file.uploadedBy }} • {{ file.date | date:'shortDate' }}
+                </p>
+              </div>
+              <div class="attachment-actions">
+                <button class="btn-attachment" title="Download">
+                  <span class="btn-icon">📥</span>
+                </button>
+                <button class="btn-attachment" title="Preview">
+                  <span class="btn-icon">👁️</span>
+                </button>
+              </div>
+            </div>
+          </div>
         </div>
-        
-        <div class="risk-grid">
-          <div class="risk-card">
-            <h4>📊 Impact Analysis</h4>
-            <div class="risk-content">
-              <p>{{ changeRequest.riskAssessment.impact || 'No impact analysis provided.' }}</p>
+
+        <!-- Risk Assessment Tab -->
+        <div *ngIf="activeTab === 'risk'" class="tab-pane">
+          <div class="risk-grid">
+            <div class="risk-card">
+              <div class="risk-header">
+                <span class="risk-icon">📊</span>
+                <h3 class="risk-title">Impact Analysis</h3>
+              </div>
+              <div class="risk-content">
+                <p>{{ changeRequest.riskAssessment.impact || 'No impact analysis provided.' }}</p>
+              </div>
             </div>
-          </div>
-          
-          <div class="risk-card">
-            <h4>🎲 Probability</h4>
-            <div class="risk-content">
-              <p>{{ changeRequest.riskAssessment.probability || 'No probability assessment provided.' }}</p>
+
+            <div class="risk-card">
+              <div class="risk-header">
+                <span class="risk-icon">🎲</span>
+                <h3 class="risk-title">Probability</h3>
+              </div>
+              <div class="risk-content">
+                <p>{{ changeRequest.riskAssessment.probability || 'No probability assessment provided.' }}</p>
+              </div>
             </div>
-          </div>
-          
-          <div class="risk-card full-width">
-            <h4>🛡️ Mitigation Strategy</h4>
-            <div class="risk-content">
-              <p>{{ changeRequest.riskAssessment.mitigation || 'No mitigation strategy provided.' }}</p>
+
+            <div class="risk-card full-width">
+              <div class="risk-header">
+                <span class="risk-icon">🛡️</span>
+                <h3 class="risk-title">Mitigation Strategy</h3>
+              </div>
+              <div class="risk-content">
+                <p>{{ changeRequest.riskAssessment.mitigation || 'No mitigation strategy provided.' }}</p>
+              </div>
             </div>
           </div>
         </div>
       </div>
     </div>
 
-    <!-- Status Change Panel -->
+    <!-- Status Update Panel -->
     <div *ngIf="authService.isAdmin() || canEdit()" class="status-panel">
-      <h3>🔄 Update Status</h3>
-      <div class="status-form">
-        <select [(ngModel)]="newStatus" class="status-select">
-          <option value="Draft">Draft</option>
-          <option value="Submitted">Submitted</option>
-          <option value="Under Review">Under Review</option>
-          <option value="Approved">Approved</option>
-          <option value="Rejected">Rejected</option>
-          <option value="Implemented">Implemented</option>
-          <option value="Closed">Closed</option>
-        </select>
-        <textarea 
-          [(ngModel)]="statusChangeComment" 
-          placeholder="Reason for status change..."
-          rows="2"
-          class="status-textarea">
-        </textarea>
-        <button (click)="updateStatus()" class="btn-status-update">
-          Update Status
-        </button>
+      <div class="panel-header">
+        <span class="panel-icon">🔄</span>
+        <h3 class="panel-title">Update Status</h3>
+      </div>
+      <div class="panel-body">
+        <div class="status-form">
+          <div class="select-wrapper">
+            <select [(ngModel)]="newStatus" class="status-select">
+              <option value="Draft">Draft</option>
+              <option value="Submitted">Submitted</option>
+              <option value="Under Review">Under Review</option>
+              <option value="Approved">Approved</option>
+              <option value="Rejected">Rejected</option>
+              <option value="Implemented">Implemented</option>
+              <option value="Closed">Closed</option>
+            </select>
+            <span class="select-arrow">▼</span>
+          </div>
+          <textarea 
+            [(ngModel)]="statusChangeComment" 
+            placeholder="Reason for status change..."
+            rows="2"
+            class="status-textarea">
+          </textarea>
+          <button (click)="updateStatus()" class="btn-status-update" [disabled]="!statusChangeComment.trim()">
+            <span class="btn-icon">🔄</span>
+            <span>Update Status</span>
+          </button>
+        </div>
       </div>
     </div>
   </div>
+
+  <!-- Footer -->
+  <footer class="cr-footer" *ngIf="changeRequest">
+    <div class="footer-info">
+      <span class="footer-icon">📋</span>
+      <span>{{ changeRequest.crNumber }} • Last updated: {{ changeRequest.history[changeRequest.history.length-1]?.date | date:'medium' }}</span>
+    </div>
+    <div class="footer-actions">
+      <a routerLink="/change-requests" class="footer-link">
+        <span>←</span>
+        <span>Back to List</span>
+      </a>
+    </div>
+  </footer>
 </div>

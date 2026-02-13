@@ -1,74 +1,127 @@
 <div class="login-container">
-  <div class="login-card">
-    <div class="login-header">
-      <h1>🔐 Documentation Generator</h1>
-      <p class="subtitle">Secure access to documentation management system</p>
+  <div class="login-card-wrapper">
+    <!-- Brand Header -->
+    <div class="brand-header">
+      <div class="brand">
+        <span class="brand-icon">📚</span>
+        <span class="brand-name">DocGen</span>
+      </div>
+      <h1 class="brand-title">Documentation Requirements Generator</h1>
+      <p class="brand-subtitle">Sign in to access your documentation workspace</p>
     </div>
 
-    <div class="login-form">
-      <form (ngSubmit)="onSubmit()" #loginForm="ngForm">
-        <div class="form-group">
-          <label for="username">Username</label>
-          <input
-            type="text"
-            id="username"
-            name="username"
-            [(ngModel)]="username"
-            (keyup)="onKeyPress($event)"
-            placeholder="Enter your username"
-            required
-            autocomplete="username"
-            class="form-control"
-            [class.is-invalid]="errorMessage"
+    <!-- Login Card -->
+    <div class="login-card">
+      <div class="card-header">
+        <h2>Welcome back</h2>
+        <p class="header-subtitle">Enter your credentials to continue</p>
+      </div>
+
+      <div class="card-body">
+        <!-- Error Alert -->
+        <div *ngIf="errorMessage" class="alert-error">
+          <span class="alert-icon">⚠️</span>
+          <span>{{ errorMessage }}</span>
+          <button type="button" class="alert-close" (click)="errorMessage = ''">✕</button>
+        </div>
+
+        <!-- Login Form -->
+        <form (ngSubmit)="onSubmit()" #loginForm="ngForm">
+          <div class="form-group">
+            <label for="username">Username</label>
+            <div class="input-wrapper">
+              <span class="input-icon">👤</span>
+              <input
+                type="text"
+                id="username"
+                name="username"
+                [(ngModel)]="username"
+                placeholder="Enter your username"
+                required
+                autocomplete="username"
+                [class.is-invalid]="errorMessage"
+              >
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label for="password">Password</label>
+            <div class="input-wrapper">
+              <span class="input-icon">🔒</span>
+              <input
+                [type]="showPassword ? 'text' : 'password'"
+                id="password"
+                name="password"
+                [(ngModel)]="password"
+                placeholder="Enter your password"
+                required
+                autocomplete="current-password"
+                [class.is-invalid]="errorMessage"
+              >
+              <button 
+                type="button" 
+                class="password-toggle"
+                (click)="showPassword = !showPassword"
+                tabindex="-1"
+              >
+                {{ showPassword ? '👁️' : '👁️‍🗨️' }}
+              </button>
+            </div>
+          </div>
+
+          <div class="form-options">
+            <label class="checkbox-label">
+              <input type="checkbox" [(ngModel)]="rememberMe" name="rememberMe">
+              <span class="checkbox-custom"></span>
+              <span class="checkbox-text">Remember me</span>
+            </label>
+            <a routerLink="/forgot-password" class="forgot-link">Forgot password?</a>
+          </div>
+
+          <button 
+            type="submit" 
+            class="btn-login"
+            [disabled]="isLoading"
           >
-        </div>
+            <span *ngIf="!isLoading">Sign In</span>
+            <span *ngIf="isLoading" class="loading-spinner">
+              <span class="spinner"></span>
+              Signing in...
+            </span>
+          </button>
+        </form>
 
-        <div class="form-group">
-          <label for="password">Password</label>
-          <input
-            type="password"
-            id="password"
-            name="password"
-            [(ngModel)]="password"
-            (keyup)="onKeyPress($event)"
-            placeholder="Enter your password"
-            required
-            autocomplete="current-password"
-            class="form-control"
-            [class.is-invalid]="errorMessage"
-          >
-        </div>
-
-        <div *ngIf="errorMessage" class="alert alert-error">
-          ⚠️ {{ errorMessage }}
-        </div>
-
-        <button 
-          type="submit" 
-          class="btn-login"
-          [disabled]="isLoading"
-        >
-          <span *ngIf="!isLoading">🔓 Login</span>
-          <span *ngIf="isLoading">⏳ Logging in...</span>
-        </button>
-      </form>
-
-      <div class="demo-credentials">
-        <h3>Demo Credentials:</h3>
-        <div class="credential-list">
-          <div *ngFor="let cred of getDemoCredentials()" class="credential-item">
-            <strong>{{ cred.role }}:</strong>
-            <!-- <div>Username: <code>{{ cred.username }}</code></div>
-            <div>Password: <code>{{ cred.password }}</code></div> -->
+        <!-- Demo Credentials -->
+        <div class="demo-section">
+          <div class="demo-header" (click)="showDemo = !showDemo">
+            <span class="demo-icon">🧪</span>
+            <span>Demo Credentials</span>
+            <span class="demo-toggle">{{ showDemo ? '−' : '+' }}</span>
+          </div>
+          
+          <div class="demo-content" *ngIf="showDemo">
+            <div *ngFor="let cred of getDemoCredentials()" class="demo-credential">
+              <span class="role-tag">{{ cred.role }}</span>
+              <div class="credential-details">
+                <div><span class="label">Username:</span> <code>{{ cred.username }}</code></div>
+                <div><span class="label">Password:</span> <code>{{ cred.password }}</code></div>
+              </div>
+            </div>
+            <p class="demo-note">⚠️ For demonstration purposes only</p>
           </div>
         </div>
       </div>
-    </div>
 
-    <div class="login-footer">
-      <p class="security-note">
-        <small>🔒 All login attempts are logged for security purposes</small>
-      </p>
+      <div class="card-footer">
+        <p class="signup-prompt">
+          Don't have an account? 
+          <a routerLink="/signup" class="signup-link">Contact administrator</a>
+        </p>
+        <p class="security-note">
+          <span>🔒</span>
+          Secure enterprise login
+        </p>
+      </div>
     </div>
   </div>
 </div>

@@ -1,20 +1,344 @@
+// Variables - Dark Theme (matching sidebar)
+$bg-color: #0f172a;
+$surface-color: #1e293b;
+$border-color: rgba(255,255,255,0.06);
+$text-primary: #f1f5f9;
+$text-secondary: #cbd5e1;
+$text-muted: #94a3b8;
+$primary-gradient: linear-gradient(135deg, #818cf8 0%, #a78bfa 100%);
+$primary-color: #818cf8;
+$shadow-sm: 0 4px 12px rgba(0,0,0,0.2);
+$shadow-md: 0 8px 24px rgba(0,0,0,0.25);
+$transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+$border-radius: 16px;
+
 .app-footer {
+  background: $bg-color;
+  border-radius: $border-radius;
+  margin-top: 24px;
+  padding: 24px;
+  color: $text-primary;
+  border: 1px solid $border-color;
+  backdrop-filter: blur(10px);
+  box-shadow: $shadow-sm;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  transition: $transition;
+
+  &:hover {
+    border-color: rgba(129, 140, 248, 0.2);
+    box-shadow: $shadow-md;
+  }
+}
+
+.footer-content {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 12px 14px;
-  margin-top: 18px;
-  border-top: 1px solid rgba(16,24,40,0.04);
-  color: var(--color-muted);
-  font-size: 0.92rem;
-  background: transparent;
+  flex-wrap: wrap;
+  gap: 20px;
 }
 
-.app-footer a {
-  color: var(--color-primary-600);
+.footer-brand {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 0.95rem;
+
+  .brand-icon {
+    font-size: 1.2rem;
+    filter: drop-shadow(0 4px 8px rgba(129, 140, 248, 0.3));
+    animation: float 3s ease-in-out infinite;
+  }
+
+  .brand-name {
+    font-weight: 700;
+    background: linear-gradient(135deg, #e2e8f0 0%, #f1f5f9 100%);
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+    letter-spacing: -0.3px;
+  }
+
+  .brand-separator {
+    color: $text-muted;
+    font-weight: 300;
+    margin: 0 4px;
+  }
+
+  .brand-tagline {
+    color: $text-muted;
+    font-size: 0.85rem;
+    display: none;
+
+    @media (min-width: 768px) {
+      display: inline;
+    }
+  }
+}
+
+.footer-links {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.footer-link {
+  color: $text-secondary;
   text-decoration: none;
+  font-size: 0.9rem;
+  font-weight: 500;
+  padding: 4px 8px;
+  border-radius: 8px;
+  transition: $transition;
+  position: relative;
+
+  &::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 0;
+    height: 2px;
+    background: $primary-gradient;
+    transition: $transition;
+    border-radius: 2px;
+  }
+
+  &:hover {
+    color: white;
+    
+    &::after {
+      width: 70%;
+    }
+  }
 }
 
-.app-footer .meta {
-  opacity: 0.9;
+.link-separator {
+  color: $text-muted;
+  font-size: 0.8rem;
+  opacity: 0.5;
+}
+
+.footer-meta {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  background: rgba(255,255,255,0.03);
+  padding: 8px 16px;
+  border-radius: 40px;
+  border: 1px solid $border-color;
+}
+
+.version-info, .build-info {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.meta-label {
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  color: $text-muted;
+  font-weight: 600;
+}
+
+.meta-value {
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: $primary-color;
+  background: linear-gradient(135deg, #818cf8 0%, #a78bfa 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.meta-separator {
+  width: 1px;
+  height: 16px;
+  background: $border-color;
+}
+
+.footer-bottom {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding-top: 20px;
+  border-top: 1px solid $border-color;
+  flex-wrap: wrap;
+  gap: 16px;
+}
+
+.copyright {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: $text-muted;
+  font-size: 0.85rem;
+
+  .copyright-icon {
+    font-size: 1rem;
+  }
+}
+
+.status-indicator {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 12px;
+  background: rgba(16, 185, 129, 0.1);
+  border-radius: 30px;
+  border: 1px solid rgba(16, 185, 129, 0.2);
+}
+
+.status-dot {
+  width: 8px;
+  height: 8px;
+  background: #10b981;
+  border-radius: 50%;
+  display: inline-block;
+  position: relative;
+  
+  &::after {
+    content: '';
+    position: absolute;
+    top: -4px;
+    left: -4px;
+    right: -4px;
+    bottom: -4px;
+    background: rgba(16, 185, 129, 0.3);
+    border-radius: 50%;
+    animation: pulse 2s ease-in-out infinite;
+  }
+}
+
+.status-text {
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: #10b981;
+  letter-spacing: 0.3px;
+}
+
+@keyframes float {
+  0%, 100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-3px);
+  }
+}
+
+@keyframes pulse {
+  0%, 100% {
+    transform: scale(1);
+    opacity: 0.6;
+  }
+  50% {
+    transform: scale(1.5);
+    opacity: 0;
+  }
+}
+
+// Tablet Styles
+@media (max-width: 899px) {
+  .app-footer {
+    padding: 20px;
+  }
+
+  .footer-content {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .footer-meta {
+    align-self: flex-start;
+  }
+
+  .footer-bottom {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+}
+
+// Mobile Styles
+@media (max-width: 480px) {
+  .app-footer {
+    padding: 16px;
+    margin-top: 16px;
+  }
+
+  .footer-brand {
+    .brand-tagline {
+      display: none;
+    }
+  }
+
+  .footer-links {
+    gap: 8px;
+  }
+
+  .footer-link {
+    font-size: 0.8rem;
+    padding: 4px 6px;
+  }
+
+  .footer-meta {
+    padding: 6px 12px;
+    gap: 12px;
+  }
+
+  .meta-label {
+    font-size: 0.7rem;
+  }
+
+  .meta-value {
+    font-size: 0.75rem;
+  }
+
+  .status-text {
+    font-size: 0.75rem;
+  }
+}
+
+// Small Mobile
+@media (max-width: 360px) {
+  .footer-links {
+    flex-wrap: wrap;
+    justify-content: flex-start;
+  }
+
+  .link-separator {
+    display: none;
+  }
+
+  .footer-link {
+    background: rgba(255,255,255,0.03);
+    border-radius: 20px;
+    padding: 6px 12px;
+    
+    &::after {
+      display: none;
+    }
+  }
+}
+
+// Dark mode optimization
+@media (prefers-color-scheme: dark) {
+  .app-footer {
+    background: $bg-color;
+  }
+}
+
+// Print styles
+@media print {
+  .app-footer {
+    background: white;
+    color: black;
+    border: 1px solid #ddd;
+    box-shadow: none;
+  }
 }
