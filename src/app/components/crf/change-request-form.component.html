@@ -1,15 +1,8 @@
 <div class="container">
-  <header class="header">
+  <div class="page-header">
     <h1>{{ isEditMode ? '✏️ Edit' : '➕ Create New' }} Change Request</h1>
     <p>{{ isEditMode ? 'Update existing change request' : 'Create a new change request for your release' }}</p>
-    <nav class="nav">
-      <a class="nav-btn" routerLink="/generator">📋 Generator</a>
-      <a class="nav-btn" routerLink="/config">⚙️ Configuration</a>
-      <a class="nav-btn" routerLink="/change-requests">📝 Change Requests</a>
-      <a class="nav-btn" routerLink="/admin/logs" *ngIf="isAdmin()">📊 Logs</a>
-      <a class="nav-btn logout-btn" (click)="logout()">🚪 Logout ({{ currentUser?.name }})</a>
-    </nav>
-  </header>
+  </div>
 
   <!-- Form Errors -->
   <div *ngIf="formErrors.length > 0" class="form-errors">

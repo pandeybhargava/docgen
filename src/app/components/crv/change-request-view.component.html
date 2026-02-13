@@ -46,16 +46,17 @@
               🗑️ Delete
             </button>
           </div>
-          <nav class="nav">
-            <a class="nav-btn" routerLink="/generator">📋 Generator</a>
-            <a class="nav-btn" routerLink="/config">⚙️ Configuration</a>
-            <a class="nav-btn" routerLink="/change-requests">📝 Change Requests</a>
-            <a class="nav-btn" routerLink="/admin/logs" *ngIf="authService.isAdmin()">📊 Logs</a>
-            <a class="nav-btn logout-btn" (click)="authService.logout()">🚪 Logout ({{ currentUser?.name }})</a>
-          </nav>
+          <!-- site navigation removed: use shared header component -->
         </div>
       </div>
-    </header>
+      </header>
+      <div class="page-header">
+        <h2>Change Request: {{ changeRequest?.title }}</h2>
+        <nav class="nav-inline">
+          <a class="nav-btn" routerLink="/change-requests">Back to List</a>
+          <a class="nav-btn" [routerLink]="['/change-requests', changeRequest?.id, 'edit']">Edit</a>
+        </nav>
+      </div>
 
     <!-- Tabs -->
     <div class="tabs">

@@ -1,15 +1,8 @@
 <div class="container">
-  <header class="header">
+  <div class="page-header">
     <h1>📋 Change Request Management</h1>
     <p>Create, track, and manage change requests for your releases</p>
-    <nav class="nav">
-      <a class="nav-btn" routerLink="/generator">📋 Generator</a>
-      <a class="nav-btn" routerLink="/config">⚙️ Configuration</a>
-      <a class="nav-btn active" routerLink="/change-requests">📝 Change Requests</a>
-      <a class="nav-btn" routerLink="/admin/logs" *ngIf="isAdmin()">📊 Logs</a>
-      <a class="nav-btn logout-btn" (click)="logout()">🚪 Logout ({{ currentUser?.name }})</a>
-    </nav>
-  </header>
+  </div>
 
  <!-- Search Section - Updated -->
 <div class="controls">

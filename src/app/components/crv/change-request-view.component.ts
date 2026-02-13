@@ -1,14 +1,14 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { Router, ActivatedRoute } from '@angular/router';
+import { Router, ActivatedRoute, RouterModule } from '@angular/router';
 import { AuthService } from '../auth/auth.service';
 import { ChangeRequestService, ChangeRequest } from '../../service/change-request.service';
 
 @Component({
   selector: 'app-change-request-view',
   standalone: true,
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule, RouterModule],
   templateUrl: './change-request-view.component.html',
   styleUrls: ['./change-request-view.component.css']
 })
